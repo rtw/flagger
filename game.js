@@ -10,7 +10,7 @@ Game = {
     bullets: [],
     team: {},
     player: {},
-    id: 0
+    id: 0,
 };
 
 Game.start = function(id) {
@@ -175,10 +175,26 @@ Game.start = function(id) {
                     Crafty.stop();
                 }
             });  
-
-
         })
 
+    Crafty.e("2D, DOM, Mouse")
+        .attr({w:1200,h:600,x:0,y:0,z: 1000})
+        .bind('MouseDown', function(e) {
+            if (e.realX > 400) {
+                Game.player.dx = 1;
+            } else if (e.realX < 200) {
+                Game.player.dx = -1;
+            } else {
+                Game.player.shoot();
+            }
+            if (e.realY < 300) {
+                Game.player.dy = -1.5;
+            }
+        })
+        .bind('MouseUp', function(e) {
+            Game.player.dx = 0;
+            Game.player.dy = 0;
+        })
 
     Crafty.viewport.scale(2);
     Crafty.viewport.scroll('_x', 0);

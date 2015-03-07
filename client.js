@@ -47,5 +47,5 @@ Client.start = function(server, gameid) {
       ws.send(JSON.stringify(data));
   }
 
-  setInterval(update, 1000);
+  setInterval(update, 16);
 }

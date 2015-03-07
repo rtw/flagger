@@ -10,6 +10,7 @@
 				margin: 0px auto;
 				border: 1px solid #666;
 				border-top: 0px;
+				width: 1200px;
 			}
 
 			.setup {
@@ -22,16 +23,34 @@
 				border-bottom: 0px;
 				padding: 20px;
 			}
+
+			.setup .menu {
+				float:left;
+				padding-right: 50px;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="setup">
-			Select Team<br>
-			<input type="radio" name="team" value="red" checked>Red
-			<input type="radio" name="team" value="blue">Blue
+			<div class='menu'>
+				Server<br>
+				IP Address: <input type="text" class="server" value="localhost:8001"><br>
+				Game ID: <input type="text" class="gameid" value="1"><br>
+				<button class='start'>Start</button>
+				<button class='stop'>Stop</button>
+				<button class='reset'>Reset</button>
+			</div>
 
-			<br><br>
-			<button class='stop'>Stop</button>
+			<div class='menu'>
+				Select Team<br>
+				<input type="radio" name="team" value="red" checked>Red
+				<input type="radio" name="team" value="blue">Blue
+			</div>
+
+			<div class='menu'>
+				Status<br>
+				<span class='connected'>Not Connected</span>
+			</div>
 		</div>
     	<div id="cr-stage"></div>
 

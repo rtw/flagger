@@ -1,27 +1,32 @@
 var ws = require("nodejs-websocket")
 
-var Game = {
-    redteam: {
-        name: 'red',
-        players: [
-            {
-                x: 50,
-                y: 500
-            }
-        ]
-    },
-    blueteam: {
-        name: 'blue',
-        players: [
-            {
-                x: 1150,
-                y: 500
-            }
-        ]
-    },
-    bullets: [],
-    team: {}
-};
+var newGame = function(id) {
+    var Game = {
+        redteam: {
+            name: 'red',
+            players: [
+                {
+                    x: 50,
+                    y: 500
+                }
+            ]
+        },
+        blueteam: {
+            name: 'blue',
+            players: [
+                {
+                    x: 1150,
+                    y: 500
+                }
+            ]
+        },
+        bullets: [],
+        team: {},
+        id:id
+    };
+
+    return Game;
+}
 
 var server = ws.createServer(function (conn) {
     console.log("Connection open")

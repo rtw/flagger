@@ -56,7 +56,6 @@ var server = ws.createServer(function (conn) {
             }
         } else if (msg.type == 'update') {
             var game = findGame(msg.gameid);
-
             if (!game) return;
 
             
@@ -73,6 +72,14 @@ var server = ws.createServer(function (conn) {
                     y: msg.y
                 }
             }
+        } else if (msg.type == 'bullet') {
+            var game = findGame(msg.gameid);
+            if (!game) return;
+
+            // broadcast bullet
+            server.connections.forEach(function (conn) {
+                conn.sendText(JSON.stringify(msg));
+            })
         }
     });
     
@@ -84,7 +91,8 @@ var server = ws.createServer(function (conn) {
 
 function update() {
     games.forEach(function(game) {
-        var msg = JSON.stringify(game);
+        var data = {type:'update', game:game};
+        var msg = JSON.stringify(data);
         server.connections.forEach(function (conn) {
             conn.sendText(msg);
         })

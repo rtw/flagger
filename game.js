@@ -16,78 +16,9 @@ Game = {
 Game.start = function(id) {
     Game.id = id;
     Crafty.init(1200, 600);
+    
+    // Level 1
     Crafty.background('#FFFFFF');
-
-    for (var idx = 0; idx < 1; idx ++) {
-        var player = Crafty.e('2D, DOM, Color, Multiway, Gravity, player, Collision, Platform')
-            .attr({x: 50 + idx * 20, y: 500, w: 10, h: 20, dx:0, dy:0})
-            .color('#FF0000')
-            .gravity("Platform")
-            .gravityConst(0.05)
-            .onHit('Player2Bullet', function () {
-                this.alive = false;
-            })
-            .bind('EnterFrame', function () {
-                this.x += this.dx;
-                this.y += this.dy;
-            });
-        player.shoot = function() {
-            var dir = this.dx * 5 || 5;
-            fireredbullet(this.x, this.y, dir);
-        }
-        player.alive = true;
-
-        Game.redteam.players.push(player);
-    }
-    var fireredbullet = function(x, y, dx) {
-        var bullet = Crafty.e("2D, DOM, Color, Collision, Player1Bullet")
-            .color('#FF0000')
-            .attr({ x: x, y: y, w: 2, h: 2, dx: dx})
-            .bind('EnterFrame', function () {
-                this.x += this.dx;
-            })
-            .onHit('Player2', function () {
-                this.dx = 0;
-                this.didhit = true;
-            });
-        Game.bullets.push(bullet);
-    }
-
-    for (var idx = 0; idx < 1; idx ++) {
-        var player = Crafty.e('2D, DOM, Color, Multiway, Gravity, player, Collision, Platform')
-            .attr({x: 1150 + (idx * 20), y: 500, w: 10, h: 20, dx:0, dy:0})
-            .color('#0000FF')
-            .gravity("Platform")
-            .gravityConst(0.05)
-            .onHit('Player1Bullet', function () {
-                this.alive = false;
-            })
-            .bind('EnterFrame', function () {
-                this.x += this.dx;
-                this.y += this.dy;
-            });
-        player.shoot = function() {
-            var dir = this.dx * 5 || 5;
-            firebluebullet(this.x, this.y, dir);
-        }
-        player.alive = true;
-        
-        Game.blueteam.players.push(player);
-    }
-    var firebluebullet = function(x, y, dx) {
-        var bullet = Crafty.e("2D, DOM, Color, Collision, Player2Bullet")
-            .color('#0000FF')
-            .attr({ x: x, y: y, w: 2, h: 2, dx: dx})
-            .bind('EnterFrame', function () {
-                this.x += this.dx;
-            })
-            .onHit('Player1', function () {
-                this.dx = 0;
-                this.didhit = true;
-            });
-        Game.bullets.push(bullet);
-    }
-
 
     Crafty.e('2D, DOM, Color, Platform, Collision')
         .attr({x: 0, y: 500, w: 1200, h: 100})
@@ -105,6 +36,81 @@ Game.start = function(id) {
         .attr({x: 300, y: 350, w: 400, h: 2})
         .color('#00FF00');
 
+
+    // Create Red Team
+    for (var idx = 0; idx < 1; idx ++) {
+        var player = Crafty.e('2D, DOM, Color, Multiway, Gravity, player, Collision, Platform')
+            .attr({x: 50 + idx * 20, y: 500, w: 10, h: 20, dx:0, dy:0})
+            .color('#FF0000')
+            .gravity("Platform")
+            .gravityConst(0.05)
+            .onHit('Player2Bullet', function () {
+                this.alive = false;
+            })
+            .bind('EnterFrame', function () {
+                this.x += this.dx;
+                this.y += this.dy;
+            });
+        player.shoot = function() {
+            var dir = this.dx * 5 || 5;
+            Client.firebullet('red', this.x, this.y, dir);
+        }
+        player.alive = true;
+
+        Game.redteam.players.push(player);
+    }
+    Game.fireredbullet = function(x, y, dx) {
+        console.log('fire red bullet');
+        var bullet = Crafty.e("2D, DOM, Color, Collision, Player1Bullet")
+            .color('#FF0000')
+            .attr({ x: x, y: y, w: 2, h: 2, dx: dx})
+            .bind('EnterFrame', function () {
+                this.x += this.dx;
+            })
+            .onHit('Player2', function () {
+                this.dx = 0;
+                this.didhit = true;
+            });
+        Game.bullets.push(bullet);
+    }
+
+    // Create Blue Team
+    for (var idx = 0; idx < 1; idx ++) {
+        var player = Crafty.e('2D, DOM, Color, Multiway, Gravity, player, Collision, Platform')
+            .attr({x: 1150 + (idx * 20), y: 500, w: 10, h: 20, dx:0, dy:0})
+            .color('#0000FF')
+            .gravity("Platform")
+            .gravityConst(0.05)
+            .onHit('Player1Bullet', function () {
+                this.alive = false;
+            })
+            .bind('EnterFrame', function () {
+                this.x += this.dx;
+                this.y += this.dy;
+            });
+        player.shoot = function() {
+            var dir = this.dx * 5 || 5;
+            Client.firebullet('blue', this.x, this.y, dir);
+        }
+        player.alive = true;
+        
+        Game.blueteam.players.push(player);
+    }
+    Game.firebluebullet = function(x, y, dx) {
+        console.log('fire blue bullet');
+        var bullet = Crafty.e("2D, DOM, Color, Collision, Player2Bullet")
+            .color('#0000FF')
+            .attr({ x: x, y: y, w: 2, h: 2, dx: dx})
+            .bind('EnterFrame', function () {
+                this.x += this.dx;
+            })
+            .onHit('Player1', function () {
+                this.dx = 0;
+                this.didhit = true;
+            });
+
+        Game.bullets.push(bullet);
+    }
 
     Crafty.e()
         .bind('KeyDown', function(e) {
@@ -128,8 +134,9 @@ Game.start = function(id) {
             } 
           })
         .bind('EnterFrame', function () {
-            var follow = Game.team.players[0];
-
+            
+            // move Camera
+            var follow = Game.player;
             var x = follow.x;
             if (x < 300) { 
                 x = 0; 
@@ -138,9 +145,10 @@ Game.start = function(id) {
             } else { 
                 x = -1 * (follow.x - 300);
             }
-            
             Crafty.viewport.scroll('_x', x);
             Crafty.viewport.scroll('_y', -1 * (follow.y / 2));
+
+
 
             Game.bullets.forEach(function(item) {
                 if (item.didhit) {
@@ -177,6 +185,7 @@ Game.start = function(id) {
             });  
         })
 
+    // Clicks for mobile movement
     Crafty.e("2D, DOM, Mouse")
         .attr({w:1200,h:600,x:0,y:0,z: 1000})
         .bind('MouseDown', function(e) {
@@ -202,4 +211,6 @@ Game.start = function(id) {
 
     Game.team = Game.redteam;
     Game.player = Game.team.players[0];
+
+
 }

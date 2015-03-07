@@ -1,8 +1,13 @@
 Client = {};
 var ws
 
+Client.firebullet = function(team, x, y, dx) {
+    var data = {gameid: Client.gameid, type:'bullet', team:team, x:x, y:y, dx:dx}
+    ws.send(JSON.stringify(data));
+}
 
 Client.start = function(server, gameid) {
+  Client.gameid = gameid;
   ws = new WebSocket("ws://" + server);
 
   ws.onopen = function() {
@@ -12,20 +17,37 @@ Client.start = function(server, gameid) {
       ws.send(JSON.stringify(data));
   };
 
+  var lasttime = new Date().getTime();
+
   ws.onmessage = function (evt) { 
-    console.log(evt.data);
+      var thistime = new Date().getTime();
+      var ping = thistime - lasttime;
+      lasttime = thistime;
+
+      $('.ping').html(ping);
+
       if (!Game.team) return;
 
       var msg = JSON.parse(evt.data);
 
-      if (Game.team.name == 'red') {
-    		  Game.blueteam.players[0].x = msg.blueteam.players[0].x;  	
-    		  Game.blueteam.players[0].y = msg.blueteam.players[0].y;
-      }
+      if (msg.type == 'update') {
+          if (Game.team.name == 'red') {
+        		  Game.blueteam.players[0].x = msg.game.blueteam.players[0].x;  	
+        		  Game.blueteam.players[0].y = msg.game.blueteam.players[0].y;
+          }
 
-      if (Game.team.name == 'blue') {
-          Game.redteam.players[0].x = msg.redteam.players[0].x;   
-          Game.redteam.players[0].y = msg.redteam.players[0].y;
+          if (Game.team.name == 'blue') {
+              Game.redteam.players[0].x = msg.game.redteam.players[0].x;   
+              Game.redteam.players[0].y = msg.game.redteam.players[0].y;
+          }
+
+          update();
+      } else if (msg.type == 'bullet') {
+          if (msg.team == 'red') {
+              Game.fireredbullet(msg.x, msg.y, msg.dx);
+          } else {
+              Game.firebluebullet(msg.x, msg.y, msg.dx);
+          }
       }
   };
 
@@ -46,6 +68,4 @@ Client.start = function(server, gameid) {
   	
       ws.send(JSON.stringify(data));
   }
-
-  setInterval(update, 16);
 }

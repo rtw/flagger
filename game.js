@@ -1,16 +1,24 @@
+Game = {
+    redteam: {
+        name: 'red',
+        players: []
+    },
+    blueteam: {
+        name: 'blue',
+        players: []
+    },
+    bullets: [],
+    team: {},
+    player: {}
+};
+
 Crafty.init(1200, 600);
-Crafty.background('#000000');
-
-
-var team1 = [];
-var bullets = [];
-var team2 = [];
+Crafty.background('#FFFFFF');
 
 for (var idx = 0; idx < 1; idx ++) {
     var player1 = Crafty.e('2D, DOM, Color, Multiway, Gravity, Player1, Collision, Platform')
-        .attr({x: 50 + idx * 20, y: 500, w: 10, h: 20})
+        .attr({x: 50 + idx * 20, y: 500, w: 10, h: 20, dx:0})
         .color('#FF0000')
-        .multiway(2, {W: -90, A: 180, D: 0})
         .gravity("Platform")
         .gravityConst(0.05)
         .onHit('Player2Bullet', function () {
@@ -21,8 +29,13 @@ for (var idx = 0; idx < 1; idx ++) {
                 fireredbullet(this.x, this.y);
             }
         })
+        .bind('EnterFrame', function () {
+            this.x += this.dx;
+        });
+
     player1.alive = true;
-    team1.push(player1);
+
+    Game.redteam.players.push(player1);
 }
 var fireredbullet = function(x, y) {
     var bullet = Crafty.e("2D, DOM, Color, Collision, Player1Bullet")
@@ -35,14 +48,15 @@ var fireredbullet = function(x, y) {
             this.dx = 0;
             this.didhit = true;
         });
-    bullets.push(bullet);
+    Game.bullets.push(bullet);
 }
 
 for (var idx = 0; idx < 1; idx ++) {
     var player2 = Crafty.e('2D, DOM, Color, Multiway, Gravity, Player2, Collision, Platform')
-        .attr({x: 1150 + (idx * 20), y: 500, w: 10, h: 20})
+        .attr({x: 1150 + (idx * 20), y: 500, w: 10, h: 20, dx:0})
         .color('#0000FF')
-        .multiway(2, {UP_ARROW: -90, LEFT_ARROW: 180, RIGHT_ARROW: 0})
+        .gravity("Platform")
+        .gravityConst(0.05)
         .onHit('Player1Bullet', function () {
             this.alive = false;
         })
@@ -51,12 +65,13 @@ for (var idx = 0; idx < 1; idx ++) {
                 firebluebullet(this.x, this.y);
             }
         })
-        .gravity("Platform")
-        .gravityConst(0.05);
+        .bind('EnterFrame', function () {
+            this.x += this.dx;
+        });
 
     player2.alive = true;
-
-    team2.push(player2);
+    
+    Game.blueteam.players.push(player2);
 }
 var firebluebullet = function(x, y) {
     var bullet = Crafty.e("2D, DOM, Color, Collision, Player2Bullet")
@@ -69,7 +84,7 @@ var firebluebullet = function(x, y) {
             this.dx = 0;
             this.didhit = true;
         });
-    bullets.push(bullet);
+    Game.bullets.push(bullet);
 }
 
 
@@ -91,8 +106,20 @@ Crafty.e('2D, DOM, Color, Platform, Collision')
 
 
 Crafty.e()
+    .bind('KeyDown', function(e) {
+        if(e.key == Crafty.keys.LEFT_ARROW) {
+            Game.player.dx = -1;
+        } else if (e.key == Crafty.keys.RIGHT_ARROW) {
+            Game.player.dx = 1;
+        } else if (e.key == Crafty.keys.UP_ARROW) {
+            Game.player.y = Game.player.y-1;
+        } 
+      })
+    .bind('KeyUp', function(e) {
+        Game.player.dx = 0;
+      })
     .bind('EnterFrame', function () {
-        var follow = team1[0];
+        var follow = Game.team.players[0];
 
         var x = follow.x;
         if (x < 300) { 
@@ -103,31 +130,50 @@ Crafty.e()
             x = -1 * (follow.x - 300);
         }
         
-
         Crafty.viewport.scroll('_x', x);
         Crafty.viewport.scroll('_y', -1 * (follow.y / 2));
 
-
-        bullets.forEach(function(item) {
+        Game.bullets.forEach(function(item) {
             if (item.didhit) {
                 item.destroy();
             }
         });
 
-        team2.forEach(function(item) {
+        Game.blueteam.players.forEach(function(item) {
             if (item.alive != true) {
                 item.destroy();
+
+                alert('Red Wins');
+                Crafty.stop();
+            }
+
+            if (item.x < 0) {
+                alert('Blue Wins');
+                Crafty.stop();
             }
         }); 
 
-        team1.forEach(function(item) {
+        Game.redteam.players.forEach(function(item) {
             if (item.alive != true) {
                 item.destroy();
+
+                alert('Blue Wins');
+                Crafty.stop();
             }
-        });      
+
+            if (item.x > 1200) {
+                alert('Red Wins');
+                Crafty.stop();
+            }
+        });  
+
+
     })
 
 
 Crafty.viewport.scale(2);
 Crafty.viewport.scroll('_x', 0);
 Crafty.viewport.scroll('_y', -202);
+
+Game.team = Game.redteam;
+Game.player = Game.team.players[0];

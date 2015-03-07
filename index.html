@@ -1,13 +1,44 @@
 <html>
 	<head>
 		<style>
-			#cr-stage {margin: 0px auto;}
+			body, html {
+				margin: 0px;
+				padding: 0px;
+			}
+
+			#cr-stage {
+				margin: 0px auto;
+				border: 1px solid #666;
+				border-top: 0px;
+			}
+
+			.setup {
+				height: 60px;
+				width: 1160px;
+				background: #ddd;
+				margin: 0px auto;
+				padding:0px;
+				border: 1px solid #666;
+				border-bottom: 0px;
+				padding: 20px;
+			}
 		</style>
 	</head>
 	<body>
+		<div class="setup">
+			Select Team<br>
+			<input type="radio" name="team" value="red" checked>Red
+			<input type="radio" name="team" value="blue">Blue
+
+			<br><br>
+			<button class='stop'>Stop</button>
+		</div>
     	<div id="cr-stage"></div>
 
+    	<script src="jquery-1.11.2.js"></script>
+    	<script src="index.js"></script>
     	<script src="crafty.js"></script>
 		<script src="game.js"></script>
+		<script src="client.js"></script>
   </body>
 </html>

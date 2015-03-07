@@ -1,6 +1,6 @@
 $(function() {
 
-	$('input[name=team]').click(function() {
+	var setTeam = function() {
 		var team = $('input[name=team]:checked').val();
 
 		if (team == 'red') {
@@ -10,6 +10,10 @@ $(function() {
 		}
 
 		Game.player = Game.team.players[0];
+	}
+
+	$('input[name=team]').click(function() {
+		setTeam();
 	});
 
 	$('.reset').click(function() {
@@ -26,6 +30,8 @@ $(function() {
 
 		Game.start(gameid);
 		Client.start(server, gameid);
+
+		setTeam();
 	})
 
 })

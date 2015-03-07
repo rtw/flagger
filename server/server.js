@@ -1,5 +1,7 @@
 var ws = require("nodejs-websocket")
 
+var games = [];
+
 var newGame = function(id) {
     var Game = {
         redteam: {
@@ -21,11 +23,22 @@ var newGame = function(id) {
             ]
         },
         bullets: [],
-        team: {},
         id:id
     };
 
     return Game;
+}
+
+var findGame = function(id) {
+    var game;
+
+    games.forEach(function(item) {
+        if (item.id == id) {
+            game = item;
+        }
+    })
+
+    return game;
 }
 
 var server = ws.createServer(function (conn) {
@@ -34,17 +47,31 @@ var server = ws.createServer(function (conn) {
     conn.on("text", function (str) {
         var msg = JSON.parse(str);
 
-        if (msg.team == 'red') {
-        	Game.redteam.players[0] = {
-                x: msg.x,
-                y: msg.y
-            }
-        }
+        if (msg.type == 'connect') {
+            var game = findGame(msg.gameid);
 
-        if (msg.team == 'blue') {
-        	Game.blueteam.players[0] = {
-                x: msg.x,
-                y: msg.y
+            if (!game) {
+                game = newGame(msg.gameid);
+                games.push(game);
+            }
+        } else if (msg.type == 'update') {
+            var game = findGame(msg.gameid);
+
+            if (!game) return;
+
+            
+            if (msg.team == 'red') {
+                game.redteam.players[0] = {
+                    x: msg.x,
+                    y: msg.y
+                }
+            }
+
+            if (msg.team == 'blue') {
+                game.blueteam.players[0] = {
+                    x: msg.x,
+                    y: msg.y
+                }
             }
         }
     });
@@ -56,9 +83,11 @@ var server = ws.createServer(function (conn) {
 
 
 function update() {
-    var msg = JSON.stringify(Game);
-    server.connections.forEach(function (conn) {
-        conn.sendText(msg);
+    games.forEach(function(game) {
+        var msg = JSON.stringify(game);
+        server.connections.forEach(function (conn) {
+            conn.sendText(msg);
+        })
     })
 }
 

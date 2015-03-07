@@ -1,13 +1,19 @@
 Client = {};
+var ws
+
 
 Client.start = function(server, gameid) {
-  var ws = new WebSocket("ws://" + server);
+  ws = new WebSocket("ws://" + server);
 
   ws.onopen = function() {
       $('.connected').text('Connected');
+
+      var data = {type:'connect', gameid: gameid}
+      ws.send(JSON.stringify(data));
   };
 
   ws.onmessage = function (evt) { 
+    console.log(evt.data);
       if (!Game.team) return;
 
       var msg = JSON.parse(evt.data);
@@ -31,11 +37,11 @@ Client.start = function(server, gameid) {
       if (!Game.team) return;
 
       if (Game.team.name == 'red') {
-          var data = {team: 'red', x: Game.redteam.players[0].x, y: Game.redteam.players[0].y};
+          var data = {gameid: gameid, type:'update', team: 'red', x: Game.redteam.players[0].x, y: Game.redteam.players[0].y};
       }
 
       if (Game.team.name == 'blue') {
-          var data = {team: 'blue', x: Game.blueteam.players[0].x, y: Game.blueteam.players[0].y};
+          var data = {gameid: gameid, type:'update', team: 'blue', x: Game.blueteam.players[0].x, y: Game.blueteam.players[0].y};
       }
   	
       ws.send(JSON.stringify(data));

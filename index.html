@@ -1,60 +1,31 @@
+<!DOCTYPE html>
 <html>
+
 	<head>
+		<meta charset="utf-8" />
+		<title>Learn Game Development at ZENVA.com</title>
+		
+		<link rel="apple-touch-icon" href="img/game-icon.png">
+
+		<meta name="mobile-web-app-capable" content="yes">
+ 		<meta name="apple-mobile-web-app-capable" content="yes">
+ 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+ 		<meta name="viewport" content="user-scalable=0, initial-scale=1, minimum-scale=1, maximum-scale=1, width=device-width, minimal-ui=1">
+
+
+ 		<script type="text/javascript" src="js/jquery-1.11.2.js"></script>
+		<script type="text/javascript" src="js/phaser.js"></script>
+		<script type="text/javascript" src="js/game.js"></script>
+
 		<style>
-			body, html {
-				margin: 0px;
-				padding: 0px;
-			}
-
-			#cr-stage {
-				margin: 0px auto;
-				width: 1200px;
-			}
-
-			.setup {
-				height: 60px;
-				width: 1160px;
-				background: #ddd;
-				margin: 0px auto;
-				padding:0px;
-				padding: 20px;
-			}
-
-			.setup .menu {
-				float:left;
-				padding-right: 50px;
-			}
-		</style>
+		  body {
+		    padding: 0px;
+		    margin: 0px;
+		  }
+		  </style>
 	</head>
-	<body>
-		<div class="setup">
-			<div class='menu'>
-				Server<br>
-				IP Address: <input type="text" class="server" value="192.168.1.101:8001"><br>
-				Game ID: <input type="text" class="gameid" value="1"><br>
-				<button class='start'>Start</button>
-				<button class='stop'>Stop</button>
-				<button class='reset'>Reset</button>
-			</div>
 
-			<div class='menu'>
-				Select Team<br>
-				<input type="radio" name="team" value="red" checked>Red
-				<input type="radio" name="team" value="blue">Blue
-			</div>
-
-			<div class='menu'>
-				Connection <span class='connected'>Not Connected</span>
-				<br>
-				Ping <span class='ping'></span>
-			</div>
-		</div>
-    	<div id="cr-stage"></div>
-
-    	<script src="jquery-1.11.2.js"></script>
-    	<script src="index.js"></script>
-    	<script src="crafty.js"></script>
-		<script src="game.js"></script>
-		<script src="client.js"></script>
-  </body>
+	<body>  
+		<div id="game"></div>
+	</body>
 </html>

@@ -9,6 +9,8 @@ var btn = {
 	left: false,
 	up: false
 };
+var bulletTime = 0;
+var dir = 1;
 
 function preload() {
 	game.load.image('bg', 'assets/bg.png');
@@ -16,6 +18,7 @@ function preload() {
     game.load.image('ground', 'assets/ground.png');
     game.load.image('platform', 'assets/platform.png');
     game.load.image('star', 'assets/star.png');
+    game.load.image('bullet', 'assets/bullet.png');
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 
     game.scale.pageAlignHorizontally = true;
@@ -145,6 +148,7 @@ function create() {
 
 	// Setup the keyboard for input 
     cursors = game.input.keyboard.createCursorKeys();
+    fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
     //game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
 	game.world.setBounds(0, 0, 1920, 1080);
@@ -156,6 +160,9 @@ function create() {
     readyStars();
 
 	readyGameController();
+
+	bullets = game.add.group();
+	bullets.enableBody = true;
 
 	scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
     scoreText.fixedToCamera = true;
@@ -171,6 +178,21 @@ function update() {
 	    //  Add and update the score
     	score += 10;
     	scoreText.text = 'Score: ' + score;
+	}
+
+	function shoot(player) {
+		if (game.time.now > bulletTime) {
+			
+			if (dir > 0) {
+				bullet = bullets.create(player.x+25, player.y+20, 'bullet');
+				bullet.body.velocity.x = 500;
+			} else {
+				bullet = bullets.create(player.x, player.y+20, 'bullet');
+				bullet.body.velocity.x = -500;
+			}
+
+			bulletTime = game.time.now + 100;
+		}
 	}
 
 	//  Collide the player and the stars with the platforms
@@ -191,6 +213,8 @@ function update() {
         player.body.velocity.x = -150;
  
         player.animations.play('left');
+
+        dir = -1;
     }
     else if (cursors.right.isDown || btn.right )
     {
@@ -198,6 +222,8 @@ function update() {
         player.body.velocity.x = 150;
  
         player.animations.play('right');
+
+        dir = 1;
     }
     else
     {
@@ -205,6 +231,10 @@ function update() {
         player.animations.stop();
  
         player.frame = 4;
+    }
+
+    if (fireButton.isDown) {
+    	 shoot(player);
     }
     
     //  Allow the player to jump if they are touching the ground.

@@ -164,7 +164,7 @@ function create() {
 	bullets = game.add.group();
 	bullets.enableBody = true;
 
-	scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+	scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#FFF' });
     scoreText.fixedToCamera = true;
 
 	game.camera.follow(player);

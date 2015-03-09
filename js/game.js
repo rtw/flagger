@@ -180,14 +180,24 @@ function update() {
     	scoreText.text = 'Score: ' + score;
 	}
 
+	function playerHit (player, bullet) {
+        // Removes the star from the screen
+	    player.kill();
+	    bullet.kill();
+
+	    //  Add and update the score
+    	score += 10;
+    	scoreText.text = 'Score: ' + score;
+	}
+
 	function shoot(player) {
 		if (game.time.now > bulletTime) {
 			
 			if (dir > 0) {
-				bullet = bullets.create(player.x+25, player.y+20, 'bullet');
+				bullet = bullets.create(player.x+30, player.y+20, 'bullet');
 				bullet.body.velocity.x = 500;
 			} else {
-				bullet = bullets.create(player.x, player.y+20, 'bullet');
+				bullet = bullets.create(player.x-2, player.y+20, 'bullet');
 				bullet.body.velocity.x = -500;
 			}
 
@@ -203,6 +213,8 @@ function update() {
     game.physics.arcade.collide(stars, platforms);
 
     game.physics.arcade.overlap(players, stars, collectStar, null, this);
+
+    game.physics.arcade.overlap(players, bullets, playerHit, null, this);
 
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;

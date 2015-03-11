@@ -10,10 +10,10 @@ Client.playerHit = function(team) {
     ws.send(JSON.stringify(data));
 }
 
-Client.shoot = function(team, dir) {
+Client.shoot = function(team, dir, playernumber) {
     if (!connected) return;
 
-    var data = {gameid: Client.gameid, type:'shoot', team:team, dir:dir}
+    var data = {gameid: gameid, type:'shoot', team:team, dir:dir, playernumber: playernumber}
     ws.send(JSON.stringify(data));
 }
 
@@ -105,11 +105,11 @@ Client.start = function(server, callback) {
                 redplayer.y = redmsg.y;
             }
         } else if (msg.type == 'shoot') {
-            if (msg.team == 'red' && team == 'blue') {
-                shoot(teams.red.players[0], msg.dir, false);
+            if (msg.team == 'red') {
+                shoot(teams.red.players[msg.playernumber], msg.dir, false);
             } 
-            if (msg.team == 'blue' && team == 'red') {
-                shoot(teams.blue.players[0], msg.dir, false);
+            if (msg.team == 'blue') {
+                shoot(teams.blue.players[msg.playernumber], msg.dir, false);
             }
         } else if (msg.type == 'score') {
             if (msg.team == 'red') {
@@ -120,10 +120,10 @@ Client.start = function(server, callback) {
                 blueScoreText.text = 'Blue: ' + score.blue;
             }
         } else if (msg.type == 'hit') {
-            if (msg.team == 'red' && team == 'red') {
+            if (msg.team == 'red' && team.name == 'red') {
                 hit(teams.red.players[0]);
             } 
-            if (msg.team == 'blue' && team == 'blue') {
+            if (msg.team == 'blue' && team.name == 'blue') {
                 hit(teams.blue.players[0]);
             }
         } else if (msg.type == 'action') {

@@ -357,7 +357,7 @@ function shoot(player, bulletdir, relay) {
 	bulletTime = game.time.now + 400;
 
 	if (relay) {
-		Client.shoot(team.name, bulletdir);
+		Client.shoot(team.name, bulletdir, playernumber);
 	}
 }
 

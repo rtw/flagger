@@ -26,7 +26,6 @@ setInterval(function() {
                 server.connections.forEach(function (conn) {
                     var data = {type:'action', code: 'starlight'};
                     var msg = JSON.stringify(data);
-                    console.log(msg);
                     conn.sendText(msg);
                 })
             }
@@ -106,6 +105,7 @@ var server = ws.createServer(function (conn) {
             players[msg.playernumber].dx = msg.dx;
             players[msg.playernumber].direction = msg.direction;
         } else if (msg.type == 'shoot') {
+            console.log(msg);
             var game = findGame(msg.gameid);
             if (!game) return;
 

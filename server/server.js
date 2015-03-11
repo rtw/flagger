@@ -36,34 +36,34 @@ setInterval(function() {
     });
 }, 10000);
 
+
+
 var games = [];
 
-var newGame = function(id) {
-    var Game = {
+var newGame = function(id, redplayers, blueplayers) {
+
+    var game = {
         redteam: {
             name: 'red',
-            players: [
-                {
-                    x: 32,
-                    y: 968,
-                    dx: 0
-                }
-            ]
+            players: redplayers
         },
         blueteam: {
             name: 'blue',
-            players: [
-                {
-                    x: 1770,
-                    y: 968,
-                    dx: 0
-                }
-            ]
+            players: blueplayers
         },
         id:id
     };
 
-    return Game;
+    for (var idx = 0; idx<redplayers.length; idx++) {
+        game.redteam.players[idx] = {};
+    }
+
+    for (var idx = 0; idx<blueplayers.length; idx++) {
+        game.blueteam.players[idx] = {};
+    }
+
+
+    return game;
 }
 
 var findGame = function(id) {
@@ -84,7 +84,12 @@ var server = ws.createServer(function (conn) {
     conn.on("text", function (str) {
         var msg = JSON.parse(str);
 
-        if (msg.type == 'connect') {
+        if (msg.type == 'newgame') {
+            console.log('newgame');
+            game = newGame(msg.gameid, msg.redplayers, msg.blueplayers);
+            games.push(game);
+        } else if (msg.type == 'connect') {
+            console.log('connect');
             var game = findGame(msg.gameid);
 
             if (!game) {
@@ -95,27 +100,25 @@ var server = ws.createServer(function (conn) {
             var game = findGame(msg.gameid);
             if (!game) return;
 
-            
             if (msg.team == 'red') {
-                game.redteam.players[0] = {
-                    x: msg.x,
-                    y: msg.y,
-                    dx: msg.dx
+                for (var idx=0;idx<msg.players.length;idx++) {
+                    game.redteam.players[idx].x = msg.players[idx].x;
+                    game.redteam.players[idx].y = msg.players[idx].y;
+                    game.redteam.players[idx].direction = msg.players[idx].direction;
                 }
             }
 
             if (msg.team == 'blue') {
-                game.blueteam.players[0] = {
-                    x: msg.x,
-                    y: msg.y,
-                    dx: msg.dx
+                for (var idx=0;idx<msg.players.length;idx++) {
+                    game.blueteam.players[idx].x = msg.players[idx].x;
+                    game.blueteam.players[idx].y = msg.players[idx].y;
+                    game.blueteam.players[idx].direction = msg.players[idx].direction;
                 }
             }
         } else if (msg.type == 'shoot') {
             var game = findGame(msg.gameid);
             if (!game) return;
 
-            // broadcast bullet
             server.connections.forEach(function (conn) {
                 conn.sendText(JSON.stringify(msg));
             })
@@ -127,7 +130,6 @@ var server = ws.createServer(function (conn) {
                 conn.sendText(JSON.stringify(msg));
             })
         }else if (msg.type == 'hit') {
-            console.log('hit ' + msg.team);
             var game = findGame(msg.gameid);
             if (!game) return;
 

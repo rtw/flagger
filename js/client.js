@@ -1,6 +1,7 @@
 Client = {};
-var ws,
-    connected = false;
+var ws;
+
+connected = false;
 
 Client.playerHit = function(team) {
     if (!connected) return;
@@ -18,21 +19,32 @@ Client.shoot = function(team, dir) {
 
 Client.updateScore = function(team, score) {
     if (!connected) return;
-    
+
     var data = {gameid: Client.gameid, type:'score', team:team, score:score}
     ws.send(JSON.stringify(data));
 }
 
-Client.start = function(server, gameid) {
-  Client.gameid = gameid;
+Client.newGame = function(gameid, redplayers, blueplayers) {
+    if (!connected) return;
+
+    var data = {type:'newgame', gameid: gameid, redplayers: redplayers, blueplayers: blueplayers}
+    ws.send(JSON.stringify(data));
+}
+
+Client.connect = function(gameid) {
+    if (!connected) return;
+
+    var data = {type:'connect', gameid: gameid}
+    ws.send(JSON.stringify(data));
+}
+
+Client.start = function(server, callback) {
   ws = new WebSocket("ws://" + server);
 
   ws.onopen = function() {
-      var data = {type:'connect', gameid: gameid}
-      ws.send(JSON.stringify(data));
-
       console.log('connected');
       connected = true;
+      callback();
   };
 
   var lasttime = new Date().getTime();
@@ -111,26 +123,37 @@ Client.start = function(server, gameid) {
           readyStars();
         }
       }
-  };
+    };
 
     ws.onclose = function() { 
         console.log('lost connection');
         connected = false;
+        callback();
     };
+}
+
+function update() {
+    if (connected) {
+        if (team == 'red') {
+            var data = {
+                gameid: gameid, 
+                type:'update', 
+                team: 'red', 
+                players: teams.red.players
+            };
+        }
+
+        if (team == 'blue') {
+            var data = {
+                gameid: gameid, 
+                type:'update', 
+                team: 'blue', 
+                players: teams.red.players
+            };
+        }
     
-    function update() {
-        if (connected) {
-            if (team == 'red') {
-                var data = {gameid: gameid, type:'update', team: 'red', x: teams.red.players[0].x, y: teams.red.players[0].y, dx: dx};
-            }
+        ws.send(JSON.stringify(data));
 
-            if (team == 'blue') {
-                var data = {gameid: gameid, type:'update', team: 'blue', x: teams.blue.players[0].x, y: teams.blue.players[0].y, dx: dx};
-            }
-      	
-            ws.send(JSON.stringify(data));
-
-            setTimeout(update, 16);
-        };
-    }
+        setTimeout(update, 16);
+    };
 }

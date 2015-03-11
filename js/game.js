@@ -3,8 +3,10 @@ var game = new Phaser.Game(960, 540, Phaser.AUTO, '', { preload: preload, create
 var platforms,
 	redplayers,
 	blueplayers,
+	teamplayers,
 	stars,
-	bullets;
+	redbullets,
+	bluebullets;
 
 var redScoreText,
 	blueScoreText,
@@ -36,7 +38,6 @@ var score = {
 	};
 
 var bulletTime = 0,
-	dir = 1,
 	dx = 0;
 	
 
@@ -112,6 +113,8 @@ function create() {
 
 		    player.teamname = teamname;
 
+		    player.direction = 1;
+
 		    return player;
     	}
 
@@ -123,7 +126,7 @@ function create() {
     	}
 
     	for (var idx = 0; idx < teams.blue.numberOfPlayers; idx ++) {
-    		teams.blue.players.push(createPlayer(blueplayers, 'blue', 1770, 968));
+    		teams.blue.players.push(createPlayer(blueplayers, 'blue', idx*30 + 1770, 968));
     	}
     }
 
@@ -181,7 +184,6 @@ function create() {
     //  A simple background for our game
     game.add.sprite(0, 0, 'bg');
 
-
 	// Setup the keyboard for input 
     cursors = game.input.keyboard.createCursorKeys();
     fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
@@ -193,8 +195,11 @@ function create() {
 	stars = game.add.group();
    	stars.enableBody = true;
 
-	bullets = game.add.group();
-	bullets.enableBody = true;
+	redbullets = game.add.group();
+	redbullets.enableBody = true;
+
+	bluebullets = game.add.group();
+	bluebullets.enableBody = true;
 
 	readyScoreText();
 
@@ -219,7 +224,25 @@ function create() {
 	var server = getParameterByName('server');
 	var gameid = getParameterByName('gameid');
 
-	Client.start(server, gameid);
+	Client.start(server, function() {
+		var initredplayers = [], initblueplayers = [];
+		teams.red.players.forEach(function(item) {
+			initredplayers.push({
+				x: item.x,
+				y: item.y,
+				direction: item.direction
+			})
+		});
+		teams.blue.players.forEach(function(item) {
+			initblueplayers.push({
+				x: item.x,
+				y: item.y,
+				direction: item.direction
+			})
+		});
+
+		Client.newGame(gameid, initredplayers, initblueplayers);
+	});
 }
  
 function update() {
@@ -228,13 +251,13 @@ function update() {
 	    star.kill();
 
 	    //  Add and update the score
-	    if (player.team == 'red' && team == 'red') {
+	    if (player.teamname == 'red' && team == 'red') {
 	    	score.red += 10;
 	    	Client.updateScore('red', score.red);
 	    	redScoreText.text = 'Red: ' + score.red;
 	    } 
 
-	    if (player.team == 'blue' && team == 'blue') {
+	    if (player.teamname == 'blue' && team == 'blue') {
 	    	score.blue += 10;
 	    	Client.updateScore('blue', score.blue);
 	    	blueScoreText.text = 'Blue: ' + score.blue;
@@ -242,9 +265,7 @@ function update() {
 	}
 
 	function playerHit (player, bullet) {
-		if (player.team == team) return;
-
-		Client.playerHit(player.team);
+		Client.playerHit(player.teamname);
 
 		hit(player, bullet);
 	}
@@ -252,41 +273,31 @@ function update() {
 	//  Collide the player and the stars with the platforms
 	game.physics.arcade.collide(redplayers, platforms);
     game.physics.arcade.collide(blueplayers, platforms);
-    
-    game.physics.arcade.collide(stars, platforms);
 
     game.physics.arcade.overlap(redplayers, stars, collectStar, null, this);
     game.physics.arcade.overlap(blueplayers, stars, collectStar, null, this);
 
-    game.physics.arcade.overlap(redplayers, bullets, playerHit, null, this);
-    game.physics.arcade.overlap(blueplayers, bullets, playerHit, null, this);
-
-    //  Reset the players velocity (movement)
+    game.physics.arcade.overlap(redplayers, bluebullets, playerHit, null, this);
+    game.physics.arcade.overlap(blueplayers, redbullets, playerHit, null, this);
+    
+    // Move Player
     player.body.velocity.x = 0;
  
-    if (cursors.left.isDown || btn.left)
-    {
-        //  Move to the left
+    if (cursors.left.isDown || btn.left) {
         player.body.velocity.x = -150;
  
         player.animations.play('left');
 
-        dir = -1;
+        player.direction = -1;
         dx = -1;
-    }
-    else if (cursors.right.isDown || btn.right )
-    {
-        //  Move to the right
+    } else if (cursors.right.isDown || btn.right ) {
         player.body.velocity.x = 150;
  
         player.animations.play('right');
 
-        dir = 1;
+        player.direction = 1;
         dx = 1;
-    }
-    else
-    {
-        //  Stand still
+    } else {
         player.animations.stop();
  
         player.frame = 4;
@@ -294,12 +305,10 @@ function update() {
     }
 
     if (fireButton.isDown || btn.shoot) {
-    	 shoot(player, dir, true);
+    	 shoot(player, player.direction, true);
     }
     
-    //  Allow the player to jump if they are touching the ground.
-    if ((cursors.up.isDown || btn.up) && player.body.touching.down)
-    {
+    if ((cursors.up.isDown || btn.up) && player.body.touching.down) {
         player.body.velocity.y = -250;
     }
 }
@@ -327,16 +336,22 @@ function shoot(player, bulletdir, relay) {
 	if (relay && game.time.now < bulletTime) {
 		return;
 	}
+	
+	if (player.teamname == 'red') {
+		var bullets = redbullets;
+	} else {
+		var bullets = bluebullets;
+	}
 
 	if (bulletdir > 0) {
-		bullet = bullets.create(player.x+30, player.y+20, 'bullet');
+		var bullet = bullets.create(player.x+30, player.y+20, 'bullet');
 		bullet.body.velocity.x = 500;
 	} else {
-		bullet = bullets.create(player.x-2, player.y+20, 'bullet');
+		var bullet = bullets.create(player.x-2, player.y+20, 'bullet');
 		bullet.body.velocity.x = -500;
 	}
 
-	bulletTime = game.time.now + 100;
+	bulletTime = game.time.now + 400;
 
 	if (relay) {
 		Client.shoot(team, bulletdir);
@@ -352,21 +367,21 @@ function hit(player, bullet) {
 	}
 
     //  Add and update the score
-	if (player.team == 'blue' && team == 'red') {
+	if (player.teamname == 'blue' && team == 'red') {
     	score.red += 50;
     	Client.updateScore('red', score.red);
     	redScoreText.text = 'Red: ' + score.red;
     } 
 
-    if (player.team == 'red' && team == 'blue') {
+    if (player.teamname == 'red' && team == 'blue') {
     	score.blue += 50;
     	Client.updateScore('blue', score.blue);
     	blueScoreText.text = 'Blue: ' + score.blue;
     }
 
     var win = false;
-    if (player.team != team) {
-    	if (player.team == 'blue') {
+    if (player.teamname != team) {
+    	if (player.teamname == 'blue') {
     		wintext.text = 'Red Wins!';
     		wintext.fill = '#ff0000';
     	} else {
@@ -374,7 +389,7 @@ function hit(player, bullet) {
     		wintext.fill = '#0000ff';
     	}
     } else {
-    	if (player.team == 'red') {
+    	if (player.teamname == 'red') {
     		wintext.text = 'Blue Wins!';
     		wintext.fill = '#0000ff';
     	} else {

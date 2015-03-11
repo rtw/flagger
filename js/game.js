@@ -273,6 +273,7 @@ function update() {
 	//  Collide the player and the stars with the platforms
 	game.physics.arcade.collide(redplayers, platforms);
     game.physics.arcade.collide(blueplayers, platforms);
+    game.physics.arcade.collide(stars, platforms);
 
     game.physics.arcade.overlap(redplayers, stars, collectStar, null, this);
     game.physics.arcade.overlap(blueplayers, stars, collectStar, null, this);
@@ -354,7 +355,7 @@ function shoot(player, bulletdir, relay) {
 	bulletTime = game.time.now + 400;
 
 	if (relay) {
-		Client.shoot(team, bulletdir);
+		Client.shoot(team.name, bulletdir);
 	}
 }
 

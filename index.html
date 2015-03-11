@@ -3,24 +3,35 @@
 
 	<head>
 		<meta charset="utf-8" />
-		<title>Learn Game Development at ZENVA.com</title>
+		<title>Flagger</title>
 		
-		<link rel="apple-touch-icon" href="img/game-icon.png">
+		<link rel="apple-touch-icon" href="assets/dude.png">
 
 		<meta name="mobile-web-app-capable" content="yes">
  		<meta name="apple-mobile-web-app-capable" content="yes">
+
  		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
  		<meta name="viewport" content="user-scalable=0, initial-scale=1, minimum-scale=1, maximum-scale=1, width=device-width, minimal-ui=1">
 
 
- 		<script type="text/javascript" src="js/jquery-1.11.2.js"></script>
+ 		<script>
+ 			function getParameterByName(name) {
+			    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+			    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+			        results = regex.exec(location.search);
+			    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+			}
+ 		</script>
+
 		<script type="text/javascript" src="js/phaser.js"></script>
 		<script type="text/javascript" src="js/game.js"></script>
+		<script type="text/javascript" src="js/client.js"></script>
 
 		<style>
 		  body {
 		    padding: 0px;
 		    margin: 0px;
+		    background: #000;
 		  }
 		  </style>
 	</head>

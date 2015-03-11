@@ -20,7 +20,8 @@ var btn = {
 
 
 var	team,
-	player;
+	player,
+	gameid;
 
 var score = {
 		red:0,
@@ -28,10 +29,12 @@ var score = {
 	},	
 	teams = {
 		red: {
+			name: 'red',
 			numberOfPlayers: 1,
 			players:[]
 		},
 		blue: {
+			name: 'blue',
 			numberOfPlayers: 1,
 			players:[]
 		}
@@ -222,26 +225,30 @@ function create() {
 
 
 	var server = getParameterByName('server');
-	var gameid = getParameterByName('gameid');
+	gameid = getParameterByName('gameid');
+	var connect = getParameterByName('connect');
+
 
 	Client.start(server, function() {
-		var initredplayers = [], initblueplayers = [];
-		teams.red.players.forEach(function(item) {
-			initredplayers.push({
-				x: item.x,
-				y: item.y,
-				direction: item.direction
-			})
-		});
-		teams.blue.players.forEach(function(item) {
-			initblueplayers.push({
-				x: item.x,
-				y: item.y,
-				direction: item.direction
-			})
-		});
+		if (!connect) {
+			var initredplayers = [], initblueplayers = [];
+			teams.red.players.forEach(function(item) {
+				initredplayers.push({
+					x: item.x,
+					y: item.y,
+					direction: item.direction
+				})
+			});
+			teams.blue.players.forEach(function(item) {
+				initblueplayers.push({
+					x: item.x,
+					y: item.y,
+					direction: item.direction
+				})
+			});
 
-		Client.newGame(gameid, initredplayers, initblueplayers);
+			Client.newGame(gameid, initredplayers, initblueplayers);
+		}
 	});
 }
  
@@ -313,10 +320,6 @@ function update() {
         player.body.velocity.y = -250;
     }
 }
-
-
-
-
 
 function readyStars() {
    	//  Here we'll create 12 of them evenly spaced apart

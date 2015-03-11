@@ -91,11 +91,6 @@ var server = ws.createServer(function (conn) {
         } else if (msg.type == 'connect') {
             console.log('connect');
             var game = findGame(msg.gameid);
-
-            if (!game) {
-                game = newGame(msg.gameid);
-                games.push(game);
-            }
         } else if (msg.type == 'update') {
             var game = findGame(msg.gameid);
             if (!game) return;

@@ -38,6 +38,8 @@ Client.connect = function(gameid) {
 
     var data = {type:'connect', gameid: gameid}
     ws.send(JSON.stringify(data));
+
+    update();
 }
 
 Client.start = function(server, callback) {
@@ -59,48 +61,48 @@ Client.start = function(server, callback) {
         var msg = JSON.parse(evt.data);
 
         if (msg.type == 'update') {
-            if (team == 'red') {
-                for (var idx = 0; idx < msg.game.blueteam.players.length; idx ++) {
-                    var bluemsg = msg.game.blueteam.players[idx];
-                    var blueplayer = teams.blue.players[idx];
+            for (var idx = 0; idx < msg.game.blueteam.players.length; idx ++) {
+                var bluemsg = msg.game.blueteam.players[idx];
+                var blueplayer = teams.blue.players[idx];
 
-                    if (bluemsg.dx != blueplayer.dx) {
-                        if (bluemsg.dx == 1) {
-                            blueplayer.animations.play('right');
-                        } else if (bluemsg.dx == -1) {
-                            blueplayer.animations.play('left');
-                        } else {
-                            blueplayer.animations.stop();
-                            blueplayer.frame = 4;
-                        }
-                        blueplayer.dx = bluemsg.dx;
+                if (blueplayer == player) continue;
+
+                if (bluemsg.dx != blueplayer.dx) {
+                    if (bluemsg.dx == 1) {
+                        blueplayer.animations.play('right');
+                    } else if (bluemsg.dx == -1) {
+                        blueplayer.animations.play('left');
+                    } else {
+                        blueplayer.animations.stop();
+                        blueplayer.frame = 4;
                     }
-
-            		blueplayer.x = bluemsg.x;  	
-            		blueplayer.y = bluemsg.y;
+                    blueplayer.dx = bluemsg.dx;
                 }
+
+        		blueplayer.x = bluemsg.x;  	
+        		blueplayer.y = bluemsg.y;
             }
 
-            if (team == 'blue') {
-                for (var idx = 0; idx < msg.game.redteam.players.length; idx ++) {
-                    var redmsg = msg.game.redteam.players[idx];
-                    var redplayer = teams.red.players[idx];
-                  
-                    if (redmsg.dx != redplayer.dx) {
-                        if (redmsg.dx == 1) {
-                            redplayer.animations.play('right');
-                        } else if (redmsg.dx == -1) {
-                            redplayer.animations.play('left');
-                        } else {
-                            redplayer.animations.stop();
-                            redplayer.frame = 4;
-                        }
-                        redplayer.dx = redmsg.dx;
-                    }
+            for (var idx = 0; idx < msg.game.redteam.players.length; idx ++) {
+                var redmsg = msg.game.redteam.players[idx];
+                var redplayer = teams.red.players[idx];
+              
+                if (redplayer == player) continue;
 
-                    redplayer.x = redmsg.x;   
-                    redplayer.y = redmsg.y;
+                if (redmsg.dx != redplayer.dx) {
+                    if (redmsg.dx == 1) {
+                        redplayer.animations.play('right');
+                    } else if (redmsg.dx == -1) {
+                        redplayer.animations.play('left');
+                    } else {
+                        redplayer.animations.stop();
+                        redplayer.frame = 4;
+                    }
+                    redplayer.dx = redmsg.dx;
                 }
+
+                redplayer.x = redmsg.x;   
+                redplayer.y = redmsg.y;
             }
         } else if (msg.type == 'shoot') {
             if (msg.team == 'red' && team == 'blue') {
@@ -140,40 +142,18 @@ Client.start = function(server, callback) {
 
 function update() {
     if (connected) {
-        var initredplayers = [], initblueplayers = [];
-        teams.red.players.forEach(function(item) {
-            initredplayers.push({
-                x: item.x,
-                y: item.y,
-                direction: item.direction
-            })
-        });
-        teams.blue.players.forEach(function(item) {
-            initblueplayers.push({
-                x: item.x,
-                y: item.y,
-                direction: item.direction
-            })
-        });
-        
-        if (team.name == 'red') {
-            var data = {
-                gameid: gameid, 
-                type:'update', 
-                team: 'red', 
-                players: initredplayers
-            };
-        }
+        var data = {
+            gameid: gameid, 
+            type:'update', 
+            team: player.teamname,
+            playernumber: playernumber,
+            x: player.x,
+            y: player.y,
+            dx: player.dx,
+            direction: player.direction
+        };
 
-        if (team.name == 'blue') {
-            var data = {
-                gameid: gameid, 
-                type:'update', 
-                team: 'blue', 
-                players: initblueplayers
-            };
-        }
-    
+        
         ws.send(JSON.stringify(data));
     };
     setTimeout(update, 16);

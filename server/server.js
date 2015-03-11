@@ -96,20 +96,15 @@ var server = ws.createServer(function (conn) {
             if (!game) return;
 
             if (msg.team == 'red') {
-                for (var idx=0;idx<msg.players.length;idx++) {
-                    game.redteam.players[idx].x = msg.players[idx].x;
-                    game.redteam.players[idx].y = msg.players[idx].y;
-                    game.redteam.players[idx].direction = msg.players[idx].direction;
-                }
+                var players = game.redteam.players;
+            } else {
+                var players = game.blueteam.players;
             }
 
-            if (msg.team == 'blue') {
-                for (var idx=0;idx<msg.players.length;idx++) {
-                    game.blueteam.players[idx].x = msg.players[idx].x;
-                    game.blueteam.players[idx].y = msg.players[idx].y;
-                    game.blueteam.players[idx].direction = msg.players[idx].direction;
-                }
-            }
+            players[msg.playernumber].x = msg.x;
+            players[msg.playernumber].y = msg.y;
+            players[msg.playernumber].dx = msg.dx;
+            players[msg.playernumber].direction = msg.direction;
         } else if (msg.type == 'shoot') {
             var game = findGame(msg.gameid);
             if (!game) return;
@@ -148,7 +143,7 @@ function update() {
         server.connections.forEach(function (conn) {
             conn.sendText(msg);
         })
-    })
+    });
 }
 
 setInterval(update, 16);

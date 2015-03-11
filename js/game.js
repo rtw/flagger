@@ -20,6 +20,7 @@ var btn = {
 
 
 var	team,
+	playernumber,
 	player,
 	gameid;
 
@@ -40,11 +41,7 @@ var score = {
 		}
 	};
 
-var bulletTime = 0,
-	dx = 0;
-	
-
-	
+var bulletTime = 0;
 	
 
 function preload() {
@@ -216,7 +213,7 @@ function create() {
 	teams.blue.numberOfPlayers = getParameterByName('blue') || 1;
 	readyPlayers();
 
-	var playernumber = getParameterByName('player') || 0;
+	playernumber = getParameterByName('player') || 0;
 
 	player = team.players[playernumber];
 
@@ -248,6 +245,8 @@ function create() {
 			});
 
 			Client.newGame(gameid, initredplayers, initblueplayers);
+		} else {
+			Client.connect(gameid);
 		}
 	});
 }
@@ -297,19 +296,19 @@ function update() {
         player.animations.play('left');
 
         player.direction = -1;
-        dx = -1;
+        player.dx = -1;
     } else if (cursors.right.isDown || btn.right ) {
         player.body.velocity.x = 150;
  
         player.animations.play('right');
 
         player.direction = 1;
-        dx = 1;
+        player.dx = 1;
     } else {
         player.animations.stop();
  
         player.frame = 4;
-		dx = 0;
+		player.dx = 0;
     }
 
     if (fireButton.isDown || btn.shoot) {

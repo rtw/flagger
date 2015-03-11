@@ -1,7 +1,8 @@
 var game = new Phaser.Game(960, 540, Phaser.AUTO, '', { preload: preload, create: create, update: update });
  
 var platforms,
-	players,
+	redplayers,
+	blueplayers,
 	stars,
 	bullets;
 
@@ -49,7 +50,8 @@ function preload() {
     game.load.image('platform', 'assets/platform.png');
     game.load.image('star', 'assets/star.png');
     game.load.image('bullet', 'assets/bullet.png');
-    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+    game.load.spritesheet('red', 'assets/dude.png', 32, 48);
+    game.load.spritesheet('blue', 'assets/dude.png', 32, 48);
 
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignVertically = true;
@@ -91,46 +93,38 @@ function create() {
     }
 
     function readyPlayers() {
-    	players = game.add.group();
+    	function createPlayer(players, teamname, x, y) {
+    		var player = players.create(x, y, teamname);
+	 
+		    //  We need to enable physics on the player
+		    game.physics.arcade.enable(player);
+		 
+		    //  Player physics properties. Give the little guy a slight bounce.
+		    player.body.bounce.y = 0.2;
+		    player.body.gravity.y = 300;
+		    player.body.collideWorldBounds = true;
+		 
+		    //  Our two animations, walking left and right.
+		    player.animations.add('left', [0, 1, 2, 3], 10, true);
+		    player.animations.add('right', [5, 6, 7, 8], 10, true);
 
-    	// The player and its settings
-	    player1 = players.create(32, 968, 'dude');
-	 
-	    //  We need to enable physics on the player
-	    game.physics.arcade.enable(player1);
-	 
-	    //  Player physics properties. Give the little guy a slight bounce.
-	    player1.body.bounce.y = 0.2;
-	    player1.body.gravity.y = 300;
-	    player1.body.collideWorldBounds = true;
-	 
-	    //  Our two animations, walking left and right.
-	    player1.animations.add('left', [0, 1, 2, 3], 10, true);
-	    player1.animations.add('right', [5, 6, 7, 8], 10, true);
+		    player.body.gravity.y = 300;
 
-	    player1.body.gravity.y = 300;
-	    player1.team = 'red';
+		    player.teamname = teamname;
 
-    	// The player and its settings
-	    player2 = players.create(1770, 968, 'dude');
-	 
-	    //  We need to enable physics on the player
-	    game.physics.arcade.enable(player2);
-	 
-	    //  Player2 physics properties. Give the little guy a slight bounce.
-	    player2.body.bounce.y = 0.2;
-	    player2.body.gravity.y = 300;
-	    player2.body.collideWorldBounds = true;
-	 
-	    //  Our two animations, walking left and right.
-	    player2.animations.add('left', [0, 1, 2, 3], 10, true);
-	    player2.animations.add('right', [5, 6, 7, 8], 10, true);
+		    return player;
+    	}
 
-	    player2.body.gravity.y = 300;
-	    player2.team = 'blue';
+    	redplayers = game.add.group();
+    	blueplayers = game.add.group();
 
-	    teams.red.players.push(player1);
-	    teams.blue.players.push(player2);
+    	for (var idx = 0; idx < teams.red.numberOfPlayers; idx ++) {
+    		teams.red.players.push(createPlayer(redplayers, 'red', idx*30 + 32, 968));
+    	}
+
+    	for (var idx = 0; idx < teams.blue.numberOfPlayers; idx ++) {
+    		teams.blue.players.push(createPlayer(blueplayers, 'blue', 1770, 968));
+    	}
     }
 
     function readyGameController() {
@@ -256,13 +250,16 @@ function update() {
 	}
 
 	//  Collide the player and the stars with the platforms
-    game.physics.arcade.collide(players, platforms);
+	game.physics.arcade.collide(redplayers, platforms);
+    game.physics.arcade.collide(blueplayers, platforms);
     
     game.physics.arcade.collide(stars, platforms);
 
-    game.physics.arcade.overlap(players, stars, collectStar, null, this);
+    game.physics.arcade.overlap(redplayers, stars, collectStar, null, this);
+    game.physics.arcade.overlap(blueplayers, stars, collectStar, null, this);
 
-    game.physics.arcade.overlap(players, bullets, playerHit, null, this);
+    game.physics.arcade.overlap(redplayers, bullets, playerHit, null, this);
+    game.physics.arcade.overlap(blueplayers, bullets, playerHit, null, this);
 
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;

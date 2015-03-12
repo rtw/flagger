@@ -11,7 +11,7 @@ var client = new Twitter({
 
 var tweetsrun = '';
 setInterval(function() { 
-    var params = {screen_name: 'nodejs', q: '%23flagger %23game1', result_type:'recent'};
+    var params = {screen_name: 'nodejs', q: '%23flagger %23game', result_type:'recent'};
     client.get('search/tweets', params, function(error, tweets, response){
       if (!error) {
         tweets.statuses.forEach(function(item) {
@@ -19,14 +19,21 @@ setInterval(function() {
 
             var bits = item.text.split(' ');
 
+            var gameid = bits[bits.length - 2];
+
+            var game = findGame(gameid);
+            if (!game) return;
+
             var code = bits[bits.length - 1];
             
             tweetsrun += item.id;
             if (code == 'starlight') {
-                server.connections.forEach(function (conn) {
-                    var data = {type:'action', code: 'starlight'};
-                    var msg = JSON.stringify(data);
-                    conn.sendText(msg);
+                connections[game.id].forEach(function (conn) {
+                    if (conn.readyState == 1) {
+                        var data = {type:'action', code: 'starlight'};
+                        var msg = JSON.stringify(data);
+                        conn.sendText(msg);
+                    }
                 })
             }
         });

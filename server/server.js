@@ -105,7 +105,6 @@ var server = ws.createServer(function (conn) {
             players[msg.playernumber].dx = msg.dx;
             players[msg.playernumber].direction = msg.direction;
         } else if (msg.type == 'shoot') {
-            console.log(msg);
             var game = findGame(msg.gameid);
             if (!game) return;
 

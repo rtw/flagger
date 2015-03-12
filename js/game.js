@@ -227,9 +227,6 @@ function create() {
 	gameid = getParameterByName('gameid');
 	var connect = getParameterByName('connect');
 
-	var gamename = getParameterByName('gamename');
-
-
 	Client.start(server, function() {
 		if (!connect) {
 			var initredplayers = [], initblueplayers = [];
@@ -248,6 +245,7 @@ function create() {
 				})
 			});
 
+			var gamename = getParameterByName('gamename');
 			Client.newGame(gameid, gamename, initredplayers, initblueplayers);
 		} else {
 			Client.connect(gameid);
@@ -441,7 +439,10 @@ function gameover(winningteam, relay) {
 	}
 
 	wintext.text = winningteam + ' Wins!';
-   	wintext.fill = '#ff0000'; 
+	if (winningteam == 'red')
+   		wintext.fill = '#ff0000'
+   	else 
+   		wintext.fill = '#0000ff'
 
     game.paused = true;
 }

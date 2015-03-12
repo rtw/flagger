@@ -59,6 +59,22 @@
 					'&gamename=' + gamename;
 			});
 
+			$('.gameslist').on('click', '.join', function() {
+				var gameid = $(this).data('id');
+				var players = $(this).data('players');
+				var team = $(this).data('team');
+				var player = $(this).data('player');
+				var server = $('.server').val();
+
+				location.href = 'game.html?team=' + team + 
+					'&gameid=' + gameid +
+					'&red=' + players +
+					'&blue=' + players +
+					'&player=' + player +
+					'&server=' + server +
+					'&connect=true';
+			});
+
 			$('.connect').click(function() {
 				var server = $('.server').val();				
 				Client.start(server, function() {
@@ -75,7 +91,13 @@
 			var html = '<table>';
 			games.forEach(function(item) {
 				html += '<tr><td>' + item.name + '</td>' +
-					'<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class="join">Join</button></td></tr>';
+					'<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+					'<button class="join" ' +
+					'data-id="' + item.id + '" ' +
+					'data-players="' + item.redteam.players.length + '" ' +
+					'data-team="blue" ' +
+					'data-player="0" ' +
+					'>Join</button></td></tr>';
 
 			});
 			html += '</table>';
@@ -110,5 +132,9 @@
 
 			</div>
 		</div>
+
+		<div style='width: 100%;clear:both;padding-top: 100px'>
+		Default-Environment-z3nz39meqp.elasticbeanstalk.com:8001
+			</div>
 	</body>
 </html>

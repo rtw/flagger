@@ -95,7 +95,7 @@ var server = ws.createServer(function (conn) {
             conn.gameid = msg.gameid;
         } else if (msg.type == 'connect') {
             var game = findGame(msg.gameid);
-            if (!game) return;
+            if (!game || game.over) return;
 
             console.log('connect');
 
@@ -103,7 +103,7 @@ var server = ws.createServer(function (conn) {
             conn.gameid = msg.gameid;
         } else if (msg.type == 'update') {
             var game = findGame(msg.gameid);
-            if (!game) return;
+            if (!game || game.over) return;
 
             if (msg.team == 'red') {
                 var players = game.redteam.players;
@@ -117,21 +117,21 @@ var server = ws.createServer(function (conn) {
             players[msg.playernumber].direction = msg.direction;
         } else if (msg.type == 'shoot') {
             var game = findGame(msg.gameid);
-            if (!game) return;
+            if (!game || game.over) return;
 
             server.connections.forEach(function (conn) {
                 conn.sendText(JSON.stringify(msg));
             })
         } else if (msg.type == 'score') {
             var game = findGame(msg.gameid);
-            if (!game) return;
+            if (!game || game.over) return;
 
             server.connections.forEach(function (conn) {
                 conn.sendText(JSON.stringify(msg));
             })
         } else if (msg.type == 'hit') {
             var game = findGame(msg.gameid);
-            if (!game) return;
+            if (!game || game.over) return;
 
             server.connections.forEach(function (conn) {
                 conn.sendText(JSON.stringify(msg));
@@ -140,8 +140,9 @@ var server = ws.createServer(function (conn) {
             console.log('winner ' + msg.team);
 
             var game = findGame(msg.gameid);
-            if (!game) return;
+            if (!game || game.over) return;
 
+            game.over = true;
             server.connections.forEach(function (conn) {
                 conn.sendText(JSON.stringify(msg));
             })
@@ -166,4 +167,4 @@ function update() {
     });
 }
 
-setInterval(update, 16);
+setInterval(update, 1);

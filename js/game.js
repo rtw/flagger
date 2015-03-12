@@ -97,6 +97,9 @@ function create() {
     	function createPlayer(players, teamname, x, y) {
     		var player = players.create(x, y, teamname);
 	 		
+	 		//  We need to enable physics on the player
+    		game.physics.arcade.enable(player);
+
 	 		//  Our two animations, walking left and right.
 		    player.animations.add('left', [0, 1, 2, 3], 10, true);
 		    player.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -104,7 +107,7 @@ function create() {
 		    player.teamname = teamname;
 
 		    player.direction = 1;
-
+		    player.body.immovable = true;  
 		    return player;
     	}
 
@@ -207,18 +210,14 @@ function create() {
 
 	player = team.players[playernumber];
 
-	//  We need to enable physics on the player
-    game.physics.arcade.enable(player);
- 
     //  Player physics properties. Give the little guy a slight bounce.
     player.body.bounce.y = 0.2;
     player.body.gravity.y = 300;
     player.body.collideWorldBounds = true;
     player.body.gravity.y = 300;
+    player.body.immovable = false;  
 
 	game.camera.follow(player);
-
-
 
 	var server = getParameterByName('server');
 	gameid = getParameterByName('gameid');
@@ -248,6 +247,8 @@ function create() {
 			Client.connect(gameid);
 		}
 	});
+
+	readyStars();
 }
  
 function update() {
@@ -334,22 +335,28 @@ function readyStars() {
     }
 }
 
-function shoot(player, bulletdir, relay) {
+function shoot(bulletplayer, bulletdir, relay) {
 	if (relay && game.time.now < bulletTime) {
 		return;
 	}
+
+	if (!relay && bulletplayer == player) {
+		return;
+	}
 	
-	if (player.teamname == 'red') {
+	if (bulletplayer.teamname == 'red') {
 		var bullets = redbullets;
+		console.log('redbullet');
 	} else {
 		var bullets = bluebullets;
+		console.log('bluebullet');
 	}
 
 	if (bulletdir > 0) {
-		var bullet = bullets.create(player.x+30, player.y+20, 'bullet');
+		var bullet = bullets.create(bulletplayer.x+30, bulletplayer.y+20, 'bullet');
 		bullet.body.velocity.x = 500;
 	} else {
-		var bullet = bullets.create(player.x-2, player.y+20, 'bullet');
+		var bullet = bullets.create(bulletplayer.x-2, bulletplayer.y+20, 'bullet');
 		bullet.body.velocity.x = -500;
 	}
 
@@ -361,13 +368,10 @@ function shoot(player, bulletdir, relay) {
 }
 
 function hit(player, bullet) {
-	// Removes the star from the screen
     player.kill();
 
-    if (bullet) {
-    	bullet.kill();
-	}
-
+    bullet.kill();
+	
     //  Add and update the score
 	if (player.teamname == 'blue' && team == 'red') {
     	score.red += 50;

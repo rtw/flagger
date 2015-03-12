@@ -38,9 +38,9 @@ setInterval(function() {
 
 
 var games = [];
+var connections = {};
 
 var newGame = function(id, redplayers, blueplayers) {
-
     var game = {
         redteam: {
             name: 'red',
@@ -79,7 +79,7 @@ var findGame = function(id) {
 
 var server = ws.createServer(function (conn) {
     console.log("Connection open")
-    
+
     conn.on("text", function (str) {
         var msg = JSON.parse(str);
 
@@ -87,9 +87,17 @@ var server = ws.createServer(function (conn) {
             console.log('newgame');
             game = newGame(msg.gameid, msg.redplayers, msg.blueplayers);
             games.push(game);
+
+            connections[msg.gameid] = [conn];
+            conn.gameid = msg.gameid;
         } else if (msg.type == 'connect') {
-            console.log('connect');
             var game = findGame(msg.gameid);
+            if (!game) return;
+
+            console.log('connect');
+
+            connections[msg.gameid].push(conn);
+            conn.gameid = msg.gameid;
         } else if (msg.type == 'update') {
             var game = findGame(msg.gameid);
             if (!game) return;
@@ -127,7 +135,7 @@ var server = ws.createServer(function (conn) {
             })
         } else if (msg.type == 'win') {
             console.log('winner ' + msg.team);
-            
+
             var game = findGame(msg.gameid);
             if (!game) return;
 
@@ -135,7 +143,6 @@ var server = ws.createServer(function (conn) {
                 conn.sendText(JSON.stringify(msg));
             })
         }
-
     });
     
     conn.on("close", function (code, reason) {
@@ -148,7 +155,8 @@ function update() {
     games.forEach(function(game) {
         var data = {type:'update', game:game};
         var msg = JSON.stringify(data);
-        server.connections.forEach(function (conn) {
+
+        connections[game.id].forEach(function (conn) {
             conn.sendText(msg);
         })
     });

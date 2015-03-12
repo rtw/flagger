@@ -6,7 +6,7 @@ connected = false;
 Client.playerHit = function(team) {
     if (!connected) return;
 
-    var data = {gameid: Client.gameid, type:'hit', team:team}
+    var data = {gameid: gameid, type:'hit', team:team}
     ws.send(JSON.stringify(data));
 }
 
@@ -20,7 +20,7 @@ Client.shoot = function(team, dir, playernumber) {
 Client.updateScore = function(team, score) {
     if (!connected) return;
 
-    var data = {gameid: Client.gameid, type:'score', team:team, score:score}
+    var data = {gameid: gameid, type:'score', team:team, score:score}
     ws.send(JSON.stringify(data));
 }
 

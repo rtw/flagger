@@ -257,13 +257,13 @@ function update() {
 	    star.kill();
 
 	    //  Add and update the score
-	    if (player.teamname == 'red' && team == 'red') {
+	    if (player.teamname == 'red' && team.name == 'red') {
 	    	score.red += 10;
 	    	Client.updateScore('red', score.red);
 	    	redScoreText.text = 'Red: ' + score.red;
 	    } 
 
-	    if (player.teamname == 'blue' && team == 'blue') {
+	    if (player.teamname == 'blue' && team.name == 'blue') {
 	    	score.blue += 10;
 	    	Client.updateScore('blue', score.blue);
 	    	blueScoreText.text = 'Blue: ' + score.blue;
@@ -373,13 +373,13 @@ function hit(player, bullet) {
     bullet.kill();
 	
     //  Add and update the score
-	if (player.teamname == 'blue' && team == 'red') {
+	if (player.teamname == 'blue' && team.name == 'red') {
     	score.red += 50;
     	Client.updateScore('red', score.red);
     	redScoreText.text = 'Red: ' + score.red;
     } 
 
-    if (player.teamname == 'red' && team == 'blue') {
+    if (player.teamname == 'red' && team.name == 'blue') {
     	score.blue += 50;
     	Client.updateScore('blue', score.blue);
     	blueScoreText.text = 'Blue: ' + score.blue;

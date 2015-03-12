@@ -419,22 +419,27 @@ function hit(hitplayer, bullet) {
     if (win) {
 	    if (hitplayer.teamname != team) {
 	    	if (hitplayer.teamname == 'blue') {
-	    		wintext.text = 'Red Wins!';
-	    		wintext.fill = '#ff0000';
+	    		gameover('red', true);
 	    	} else {
-	    		wintext.text = 'Blue Wins!'
-	    		wintext.fill = '#0000ff';
+	    		gameover('blue', true);
 	    	}
 	    } else {
 	    	if (hitplayer.teamname == 'red') {
-	    		wintext.text = 'Blue Wins!';
-	    		wintext.fill = '#0000ff';
+	    		gameover('blue', true);
 	    	} else {
-	    		wintext.text = 'Red Wins!';
-	    		wintext.fill = '#ff0000';
+	    		gameover('red', true);
 	    	}
 	    }
-
-	    game.paused = true;
 	}
+}
+
+function gameover(winningteam, relay) {
+	if (relay) {
+		Client.win(winningteam);
+	}
+
+	wintext.text = winningteam + ' Wins!';
+   	wintext.fill = '#ff0000'; 
+
+    game.paused = true;
 }

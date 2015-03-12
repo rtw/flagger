@@ -10,6 +10,13 @@ Client.playerHit = function(team) {
     ws.send(JSON.stringify(data));
 }
 
+Client.win = function(winningteam) {
+    if (!connected) return;
+
+    var data = {gameid: gameid, type:'win', team:winningteam}
+    ws.send(JSON.stringify(data));
+}
+
 Client.shoot = function(team, dir, playernumber) {
     if (!connected) return;
 
@@ -130,7 +137,12 @@ Client.start = function(server, callback) {
             if (msg.code == 'starlight') {
                 readyStars();
             }
+        } else if (msg.type == 'win') {
+            if (team.name != msg.team) {
+                gameover(msg.team, false);
+            }
         }
+
     };
 
     ws.onclose = function() { 

@@ -118,7 +118,16 @@ var server = ws.createServer(function (conn) {
             server.connections.forEach(function (conn) {
                 conn.sendText(JSON.stringify(msg));
             })
-        }else if (msg.type == 'hit') {
+        } else if (msg.type == 'hit') {
+            var game = findGame(msg.gameid);
+            if (!game) return;
+
+            server.connections.forEach(function (conn) {
+                conn.sendText(JSON.stringify(msg));
+            })
+        } else if (msg.type == 'win') {
+            console.log('winner ' + msg.team);
+            
             var game = findGame(msg.gameid);
             if (!game) return;
 

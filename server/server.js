@@ -84,6 +84,9 @@ var server = ws.createServer(function (conn) {
         var msg = JSON.parse(str);
 
         if (msg.type == 'newgame') {
+            var game = findGame(msg.gameid);
+            if (game) return;
+
             console.log('newgame');
             game = newGame(msg.gameid, msg.redplayers, msg.blueplayers);
             games.push(game);
@@ -157,7 +160,8 @@ function update() {
         var msg = JSON.stringify(data);
 
         connections[game.id].forEach(function (conn) {
-            conn.sendText(msg);
+            if (conn.readyState == 1)
+                conn.sendText(msg);
         })
     });
 }

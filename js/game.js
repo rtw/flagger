@@ -105,8 +105,10 @@ function create() {
 		    player.animations.add('right', [5, 6, 7, 8], 10, true);
 
 		    player.teamname = teamname;
+			player.direction = 1;
+			player.health = 100;
+			player.shield = 100;
 
-		    player.direction = 1;
 		    player.body.immovable = true;  
 		    return player;
     	}
@@ -167,6 +169,8 @@ function create() {
 	    blueScoreText = game.add.text(830, 16, 'Blue: 0', { fontSize: '32px', fill: '#FFF' });
 	    blueScoreText.fixedToCamera = true;
     }
+
+    game.state.disableVisibilityChange = true;
 
     //  We're going to be using physics, so enable the Arcade Physics system
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -331,7 +335,7 @@ function readyStars() {
         star.body.gravity.y = 6;
  
         //  This just gives each star a slightly random bounce value
-        star.body.bounce.y = 0.7 + Math.random() * 0.2;
+        star.body.bounce.y = 0.8;
     }
 }
 
@@ -367,42 +371,70 @@ function shoot(bulletplayer, bulletdir, relay) {
 	}
 }
 
-function hit(player, bullet) {
-    player.kill();
+function hit(hitplayer, bullet) {
 
-    bullet.kill();
+	function updateScore() {
+		if (hitplayer.teamname == 'blue' && team.name == 'red') {
+	    	score.red += 50;
+	    	Client.updateScore('red', score.red);
+	    	redScoreText.text = 'Red: ' + score.red;
+	    } 
+
+	    if (hitplayer.teamname == 'red' && team.name == 'blue') {
+	    	score.blue += 50;
+	    	Client.updateScore('blue', score.blue);
+	    	blueScoreText.text = 'Blue: ' + score.blue;
+	    }
+	}
+
+	bullet.kill();
+    
+    if (hitplayer.shield > 0) {
+		hitplayer.shield -= 50;
+
+		if (hitplayer.shield >= 0) return;
+    }
+
+    if (hitplayer.health > 0) {
+    	hitplayer.health -= 50;
+
+    	if (hitplayer.health >= 0) return;
+    }
+
+    hitplayer.killed = true;
+    hitplayer.kill();
 	
-    //  Add and update the score
-	if (player.teamname == 'blue' && team.name == 'red') {
-    	score.red += 50;
-    	Client.updateScore('red', score.red);
-    	redScoreText.text = 'Red: ' + score.red;
-    } 
+    updateScore();
 
-    if (player.teamname == 'red' && team.name == 'blue') {
-    	score.blue += 50;
-    	Client.updateScore('blue', score.blue);
-    	blueScoreText.text = 'Blue: ' + score.blue;
-    }
 
-    var win = false;
-    if (player.teamname != team) {
-    	if (player.teamname == 'blue') {
-    		wintext.text = 'Red Wins!';
-    		wintext.fill = '#ff0000';
-    	} else {
-    		wintext.text = 'Blue Wins!'
-    		wintext.fill = '#0000ff';
-    	}
-    } else {
-    	if (player.teamname == 'red') {
-    		wintext.text = 'Blue Wins!';
-    		wintext.fill = '#0000ff';
-    	} else {
-    		wintext.text = 'Red Wins!';
-    		wintext.fill = '#ff0000';
+    // only win when all other team players are dead
+    var win = true;
+    var hitteam = teams[hitplayer.teamname];
+    for(var idx=0; idx < hitteam.players.length; idx ++) {
+    	if (!hitteam.players[idx].killed) {
+    		win = false;
     	}
     }
 
-    game.paused = true;
+    if (win) {
+	    if (hitplayer.teamname != team) {
+	    	if (hitplayer.teamname == 'blue') {
+	    		wintext.text = 'Red Wins!';
+	    		wintext.fill = '#ff0000';
+	    	} else {
+	    		wintext.text = 'Blue Wins!'
+	    		wintext.fill = '#0000ff';
+	    	}
+	    } else {
+	    	if (hitplayer.teamname == 'red') {
+	    		wintext.text = 'Blue Wins!';
+	    		wintext.fill = '#0000ff';
+	    	} else {
+	    		wintext.text = 'Red Wins!';
+	    		wintext.fill = '#ff0000';
+	    	}
+	    }
+
+	    game.paused = true;
+	}
 }

@@ -38,19 +38,25 @@
 
 		<script>
 		$(function() {
+			var id = Math.round(Math.random(1) * 100000000000);
+			$('.gameid').val(id);
+			$('.gamename').val('server-'+id);
+
 			$('.start').click(function() {
 				var gameid = $('.gameid').val();
 				var players = $('.numberplayers').val();
 				var team = $('.team').val();
 				var player = parseInt($('.player').val()) - 1;
-				var server = $('.server').val();			
+				var server = $('.server').val();	
+				var gamename = $('.gamename').val();		
 
 				location.href = 'game.html?team=' + team + 
 					'&gameid=' + gameid +
 					'&red=' + players +
 					'&blue=' + players +
 					'&player=' + player +
-					'&server=' + server;
+					'&server=' + server + 
+					'&gamename=' + gamename;
 			});
 
 			$('.connect').click(function() {
@@ -58,10 +64,24 @@
 				Client.start(server, function() {
 					if (connected) {
 						$('.status').text('Connected');
+						Client.games();
 					}
 				});
 			});
 		})
+
+		updateGames = function(games) {
+			$('.gameslist').html();
+			var html = '<table>';
+			games.forEach(function(item) {
+				html += '<tr><td>' + item.name + '</td>' +
+					'<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class="join">Join</button></td></tr>';
+
+			});
+			html += '</table>';
+
+			$('.gameslist').append(html);
+		}
 		</script>
 	</head>
 
@@ -78,6 +98,7 @@
 		<div style='width: 50%;float:left'>
 			<h1>New Game</h1>
 			<div class='label'>Game ID</div> <input type='text' class='gameid' value='1' /><br>
+			<div class='label'>Game Name</div> <input type='text' class='gamename' value='server' /><br>
 			<div class='label'>Number of players</div> <input type='number' class='numberplayers' value='1' /><br>
 			<div class='label'>Team</div> <input type='text' class='team' value='red' /><br>
 			<div class='label'>Player number</div> <input type='number' class='player' value='1' /><br>
@@ -85,7 +106,9 @@
 		</div>
 		<div style='width: 50%;float:left;'>
 			<h1>Join Game</h1>
-			<button class='start'>Join</button>
+			<div class='gameslist'>
+
+			</div>
 		</div>
 	</body>
 </html>

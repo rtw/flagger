@@ -227,6 +227,8 @@ function create() {
 	gameid = getParameterByName('gameid');
 	var connect = getParameterByName('connect');
 
+	var gamename = getParameterByName('gamename');
+
 
 	Client.start(server, function() {
 		if (!connect) {
@@ -246,7 +248,7 @@ function create() {
 				})
 			});
 
-			Client.newGame(gameid, initredplayers, initblueplayers);
+			Client.newGame(gameid, gamename, initredplayers, initblueplayers);
 		} else {
 			Client.connect(gameid);
 		}

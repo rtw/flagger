@@ -40,8 +40,9 @@ setInterval(function() {
 var games = [];
 var connections = {};
 
-var newGame = function(id, redplayers, blueplayers) {
+var newGame = function(id, name, redplayers, blueplayers) {
     var game = {
+        name: name,
         redteam: {
             name: 'red',
             players: redplayers
@@ -88,7 +89,7 @@ var server = ws.createServer(function (conn) {
             if (game) return;
 
             console.log('newgame');
-            game = newGame(msg.gameid, msg.redplayers, msg.blueplayers);
+            game = newGame(msg.gameid, msg.gamename, msg.redplayers, msg.blueplayers);
             games.push(game);
 
             connections[msg.gameid] = [conn];
@@ -145,6 +146,10 @@ var server = ws.createServer(function (conn) {
             game.over = true;
             server.connections.forEach(function (conn) {
                 conn.sendText(JSON.stringify(msg));
+            })
+        } else if (msg.type == 'games') {
+            server.connections.forEach(function (conn) {
+                conn.sendText(JSON.stringify({type:'games', games:games}));
             })
         }
     });

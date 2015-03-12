@@ -17,6 +17,14 @@ Client.win = function(winningteam) {
     ws.send(JSON.stringify(data));
 }
 
+Client.games = function() {
+    if (!connected) return;
+
+    var data = {type:'games'}
+    ws.send(JSON.stringify(data));
+}
+
+
 Client.shoot = function(team, dir, playernumber) {
     if (!connected) return;
 
@@ -31,10 +39,10 @@ Client.updateScore = function(team, score) {
     ws.send(JSON.stringify(data));
 }
 
-Client.newGame = function(gameid, redplayers, blueplayers) {
+Client.newGame = function(gameid, gamename, redplayers, blueplayers) {
     if (!connected) return;
 
-    var data = {type:'newgame', gameid: gameid, redplayers: redplayers, blueplayers: blueplayers}
+    var data = {type:'newgame', gameid: gameid, gamename:gamename, redplayers: redplayers, blueplayers: blueplayers}
     ws.send(JSON.stringify(data));
 
     update();
@@ -141,6 +149,8 @@ Client.start = function(server, callback) {
             if (team.name != msg.team) {
                 gameover(msg.team, false);
             }
+        } else if (msg.type == 'games') {
+            updateGames(msg.games);
         }
 
     };
@@ -168,5 +178,5 @@ function update() {
         
         ws.send(JSON.stringify(data));
     };
-    setTimeout(update, 16);
+    setTimeout(update, 5);
 }

@@ -27,6 +27,10 @@
 		  	font-size: 24px;	
 		  	margin-bottom: 10px;
 		  }
+		  select {
+		  	font-size: 28px;
+		  	margin-bottom: 10px;	
+		  }
 		  button {
 		  	font-size: 24px;
 		  }
@@ -39,15 +43,14 @@
 		<script>
 		$(function() {
 			var id = Math.round(Math.random(1) * 100000000000);
-			$('.gameid').val(id);
 			$('.gamename').val('server-'+id);
 
 			$('.start').click(function() {
-				var gameid = $('.gameid').val();
+				var gameid = Math.round(Math.random(1) * 100000000000);
 				var players = $('.numberplayers').val();
 				var team = $('.team').val();
 				var player = parseInt($('.player').val()) - 1;
-				var server = $('.server').val();	
+				var server = $('.server option:selected').val();
 				var gamename = $('.gamename').val();		
 
 				location.href = 'game.html?team=' + team + 
@@ -64,7 +67,7 @@
 				var players = $(this).data('players');
 				var team = $(this).data('team');
 				var player = $(this).data('player');
-				var server = $('.server').val();
+				var server = $('.server option:selected').val();
 
 				location.href = 'game.html?team=' + team + 
 					'&gameid=' + gameid +
@@ -76,7 +79,7 @@
 			});
 
 			$('.connect').click(function() {
-				var server = $('.server').val();				
+				var server = $('.server option:selected').val();				
 				Client.start(server, function() {
 					if (connected) {
 						$('.status').text('Connected');
@@ -111,7 +114,11 @@
 
 		<div style='width: 100%;float:left'>
 			<h1>Server</h1>
-			<div class='label'>Server</div> <input type='text' class='server' value='localhost:8001' /><span class='status'>Not Connected</span><br>
+			<select class='server'>
+				<option value='localhost:8001'>LAN</option>
+				<option value='Default-Environment-z3nz39meqp.elasticbeanstalk.com:8001'>Server 1</option>
+			</select>
+			<span class='status'>Not Connected</span><br>
 			
 			<button class='connect'>Connect</button>
 		</div>
@@ -119,7 +126,6 @@
 		
 		<div style='width: 50%;float:left'>
 			<h1>New Game</h1>
-			<div class='label'>Game ID</div> <input type='text' class='gameid' value='1' /><br>
 			<div class='label'>Game Name</div> <input type='text' class='gamename' value='server' /><br>
 			<div class='label'>Number of players</div> <input type='number' class='numberplayers' value='1' /><br>
 			<div class='label'>Team</div> <input type='text' class='team' value='red' /><br>
@@ -132,9 +138,5 @@
 
 			</div>
 		</div>
-
-		<div style='width: 100%;clear:both;padding-top: 100px'>
-		Default-Environment-z3nz39meqp.elasticbeanstalk.com:8001
-			</div>
 	</body>
 </html>

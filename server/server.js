@@ -179,4 +179,4 @@ function update() {
     });
 }
 
-setInterval(update, 1);
+setInterval(update, 15);

@@ -178,5 +178,5 @@ function update() {
         
         ws.send(JSON.stringify(data));
     };
-    setTimeout(update, 5);
+    setTimeout(update, 15);
 }

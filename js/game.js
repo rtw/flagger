@@ -321,21 +321,6 @@ function update() {
     }
 }
 
-function readyStars() {
-   	//  Here we'll create 12 of them evenly spaced apart
-    for (var i = 0; i < 27; i++)
-    {
-        //  Create a star inside of the 'stars' group
-        var star = stars.create(i * 70, 500, 'star');
- 
-        //  Let gravity do its thing
-        star.body.gravity.y = 6;
- 
-        //  This just gives each star a slightly random bounce value
-        star.body.bounce.y = 0.8;
-    }
-}
-
 function shoot(bulletplayer, bulletdir, relay) {
 	if (relay && game.time.now < bulletTime) {
 		return;

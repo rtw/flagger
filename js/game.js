@@ -166,14 +166,6 @@ function create() {
 	    wintext.fixedToCamera = true;
     }
 
-    function readyScoreText() {
-    	redScoreText = game.add.text(16, 16, 'Red: 0', { fontSize: '32px', fill: '#FFF' });
-	    redScoreText.fixedToCamera = true;
-
-	    blueScoreText = game.add.text(830, 16, 'Blue: 0', { fontSize: '32px', fill: '#FFF' });
-	    blueScoreText.fixedToCamera = true;
-    }
-
     function readyBoxes() {
     	boxes = game.add.group();
 		boxes.enableBody = true;
@@ -242,8 +234,6 @@ function create() {
 
 	bluebullets = game.add.group();
 	bluebullets.enableBody = true;
-
-	readyScoreText();
 
     readyWinText();
 

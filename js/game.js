@@ -185,8 +185,12 @@ function create() {
     function readyBoxes() {
     	boxes = game.add.group();
 		boxes.enableBody = true;
-		var box = boxes.create(500, 900, 'box');
-		box.body.immovable = true;
+		
+		var box1 = boxes.create(500, 900, 'box');
+		box1.body.immovable = true;
+
+		var box2 = boxes.create(550, 900, 'box');
+		box2.body.immovable = true;
     }
 
     function startServer() {

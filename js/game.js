@@ -151,14 +151,6 @@ function create() {
 	    wintext.fixedToCamera = true;
     }
 
-    function readyScoreText() {
-    	redScoreText = game.add.text(16, 16, 'Red: 0', { fontSize: '32px', fill: '#FFF' });
-	    redScoreText.fixedToCamera = true;
-
-	    blueScoreText = game.add.text(830, 16, 'Blue: 0', { fontSize: '32px', fill: '#FFF' });
-	    blueScoreText.fixedToCamera = true;
-    }
-
     game.state.disableVisibilityChange = true;
 
     //  We're going to be using physics, so enable the Arcade Physics system
@@ -192,8 +184,6 @@ function create() {
 	bluebullets = game.add.group();
 	bluebullets.enableBody = true;
 
-	readyScoreText();
-
     readyWinText();
 
     var teamname = getParameterByName('team') || 'red';
@@ -214,21 +204,7 @@ function create() {
  
 function update() {
 	function collectStar (player, star) {
-        // Removes the star from the screen
 	    star.kill();
-
-	    //  Add and update the score
-	    if (player.teamname == 'red' && team.name == 'red') {
-	    	score.red += 10;
-	    	Client.updateScore('red', score.red);
-	    	redScoreText.text = 'Red: ' + score.red;
-	    } 
-
-	    if (player.teamname == 'blue' && team.name == 'blue') {
-	    	score.blue += 10;
-	    	Client.updateScore('blue', score.blue);
-	    	blueScoreText.text = 'Blue: ' + score.blue;
-	    }
 	}
 
 	function playerHit (player, bullet) {
@@ -238,6 +214,10 @@ function update() {
 	}
 
 	//  Collide the player and the stars with the platforms
+	game.physics.arcade.collide(redplayers, redplayers);
+	game.physics.arcade.collide(blueplayers, redplayers);
+	game.physics.arcade.collide(blueplayers, blueplayers);
+
 	game.physics.arcade.collide(redplayers, platforms);
     game.physics.arcade.collide(blueplayers, platforms);
     game.physics.arcade.collide(stars, platforms);
@@ -360,20 +340,6 @@ function shoot(bulletplayer, bulletdir, relay) {
 
 function hit(hitplayer, bullet) {
 
-	function updateScore() {
-		if (hitplayer.teamname == 'blue' && team.name == 'red') {
-	    	score.red += 50;
-	    	Client.updateScore('red', score.red);
-	    	redScoreText.text = 'Red: ' + score.red;
-	    } 
-
-	    if (hitplayer.teamname == 'red' && team.name == 'blue') {
-	    	score.blue += 50;
-	    	Client.updateScore('blue', score.blue);
-	    	blueScoreText.text = 'Blue: ' + score.blue;
-	    }
-	}
-
 	bullet.kill();
     
     if (hitplayer.shield > 0) {
@@ -390,8 +356,6 @@ function hit(hitplayer, bullet) {
 
     hitplayer.killed = true;
     hitplayer.kill();
-	
-    updateScore();
 
 
     // only win when all other team players are dead

@@ -5,6 +5,7 @@ var platforms,
 	blueplayers,
 	teamplayers,
 	stars,
+	boxes,
 	redbullets,
 	bluebullets;
 
@@ -51,9 +52,11 @@ function preload() {
     game.load.image('platform', 'assets/platform.png');
     game.load.image('star', 'assets/star.png');
     game.load.image('bullet', 'assets/bullet.png');
+    game.load.image('box', 'assets/box.png');
+
     game.load.spritesheet('red', 'assets/dude.png', 32, 48);
     game.load.spritesheet('blue', 'assets/dude.png', 32, 48);
-	game.load.image('box', 'assets/box.png');
+	
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignVertically = true;
 }

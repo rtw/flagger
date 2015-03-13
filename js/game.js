@@ -300,8 +300,8 @@ function update() {
     game.physics.arcade.collide(redplayers, boxes);
 	game.physics.arcade.collide(blueplayers, boxes);
     
-    game.physics.arcade.overlap(boxes, redplayers, boxhit, null, this);
-    game.physics.arcade.overlap(boxes, blueplayers, boxhit, null, this);
+    game.physics.arcade.overlap(boxes, redbullets, boxHit, null, this);
+    game.physics.arcade.overlap(boxes, bluebullets, boxHit, null, this);
     
     // Move Player
     player.body.velocity.x = 0;
@@ -322,6 +322,10 @@ function update() {
         player.body.velocity.y = -250;
     }
 }
+
+function boxHit(box, bullet) {
+	bullet.kill();
+}	
 
 function shoot(bulletplayer, bulletdir, relay) {
 	if (relay && game.time.now < bulletTime) {

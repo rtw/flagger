@@ -4,7 +4,6 @@ var platforms,
 	redplayers,
 	blueplayers,
 	teamplayers,
-	stars,
 	boxes,
 	redbullets,
 	bluebullets;
@@ -64,21 +63,12 @@ function preload() {
 function create() {
 
     function readyPlatform() {
-    	//  The platforms group contains the ground and the 2 ledges we can jump on
 	    platforms = game.add.group();
-	 
-	    //  We will enable physics for any object that is created in this group
 	    platforms.enableBody = true;
-	 
-	    // Here we create the ground.
+
 	    var ground = platforms.create(0, game.world.height - 130, 'ground');
-	 
-	    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
 	    ground.scale.setTo(2, 2);
-	 
-	    //  This stops it from falling away when you jump on it
 	    ground.body.immovable = true; 
-		
     }
 
     function readyPlayers() {
@@ -97,9 +87,8 @@ function create() {
 			player.health = 100;
 			player.shield = 100;
 
-			//  Player physics properties. Give the little guy a slight bounce.
-		    player.body.bounce.y = 0.2;
-		    player.body.gravity.y = 300;
+		    player.body.bounce.y = 0.1;
+		    player.body.gravity.y = 700;
 		    player.body.collideWorldBounds = true;
 		    
 		    player.moveLeft = function() {
@@ -188,11 +177,11 @@ function create() {
     function readyBoxes() {
     	boxes = game.add.group();
 		boxes.enableBody = true;
-		
-		var box1 = boxes.create(500, 900, 'box');
+
+		var box1 = boxes.create(500, 910, 'box');
 		box1.body.immovable = true;
 
-		var box2 = boxes.create(550, 900, 'box');
+		var box2 = boxes.create(550, 912, 'box');
 		box2.body.immovable = true;
     }
 
@@ -248,9 +237,6 @@ function create() {
 	
 	readyBoxes();
 
-	stars = game.add.group();
-   	stars.enableBody = true;
-
 	redbullets = game.add.group();
 	redbullets.enableBody = true;
 
@@ -287,20 +273,20 @@ function update() {
 	game.physics.arcade.collide(redplayers, blueplayers);
 	game.physics.arcade.collide(redplayers, redplayers);
 
-	
 	game.physics.arcade.collide(redplayers, platforms);
     game.physics.arcade.collide(blueplayers, platforms);
-    game.physics.arcade.collide(stars, platforms);
+    game.physics.arcade.collide(boxes, platforms);
 
-    game.physics.arcade.overlap(redplayers, bluebullets, playerHit, null, this);
-    game.physics.arcade.overlap(blueplayers, redbullets, playerHit, null, this);
-
+    
     game.physics.arcade.collide(redplayers, boxes);
 	game.physics.arcade.collide(blueplayers, boxes);
     
     game.physics.arcade.overlap(boxes, redbullets, boxHit, null, this);
     game.physics.arcade.overlap(boxes, bluebullets, boxHit, null, this);
-    
+    game.physics.arcade.overlap(redplayers, bluebullets, playerHit, null, this);
+    game.physics.arcade.overlap(blueplayers, redbullets, playerHit, null, this);
+
+
     // Move Player
     player.body.velocity.x = 0;
  
@@ -316,8 +302,13 @@ function update() {
     	 shoot(player, player.direction, true);
     }
     
-    if ((cursors.up.isDown || btn.up) && player.body.touching.down) {
-        player.body.velocity.y = -250;
+    if ((cursors.up.isDown || btn.up)) {
+    	if (player.body.touching.down && !player.jump) {
+    		player.jump = true;
+        	player.body.velocity.y = -250;
+        }
+    } else {
+    	player.jump = false;
     }
 }
 

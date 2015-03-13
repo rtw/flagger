@@ -261,8 +261,6 @@ function create() {
 			Client.connect(gameid);
 		}
 	});
-
-	readyStars();
 }
  
 function update() {

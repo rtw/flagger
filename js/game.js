@@ -18,7 +18,6 @@ var btn = {
 	up: false
 };
 
-
 var	team,
 	playernumber,
 	player,
@@ -51,6 +50,7 @@ function preload() {
     game.load.image('platform', 'assets/platform.png');
     game.load.image('star', 'assets/star.png');
     game.load.image('bullet', 'assets/bullet.png');
+    
     game.load.spritesheet('red', 'assets/dude.png', 32, 48);
     game.load.spritesheet('blue', 'assets/dude.png', 32, 48);
 	game.load.image('box', 'assets/box.png');
@@ -93,7 +93,11 @@ function create() {
 			player.health = 100;
 			player.shield = 100;
 
-		    player.body.immovable = true;  
+			//  Player physics properties. Give the little guy a slight bounce.
+		    player.body.bounce.y = 0.2;
+		    player.body.gravity.y = 300;
+		    player.body.collideWorldBounds = true;
+		    
 		    return player;
     	}
 
@@ -186,7 +190,6 @@ function create() {
 
     readyWinText();
 
-
     var teamname = getParameterByName('team') || 'red';
     team = teams[teamname];
 
@@ -198,43 +201,9 @@ function create() {
 
 	player = team.players[playernumber];
 
-    //  Player physics properties. Give the little guy a slight bounce.
-    player.body.bounce.y = 0.2;
-    player.body.gravity.y = 300;
-    player.body.collideWorldBounds = true;
-    player.body.gravity.y = 300;
-    player.body.immovable = false;  
-
 	game.camera.follow(player);
 
-	var server = getParameterByName('server');
-	gameid = getParameterByName('gameid');
-	var connect = getParameterByName('connect');
-
-	Client.start(server, function() {
-		if (!connect) {
-			var initredplayers = [], initblueplayers = [];
-			teams.red.players.forEach(function(item) {
-				initredplayers.push({
-					x: item.x,
-					y: item.y,
-					direction: item.direction
-				})
-			});
-			teams.blue.players.forEach(function(item) {
-				initblueplayers.push({
-					x: item.x,
-					y: item.y,
-					direction: item.direction
-				})
-			});
-
-			var gamename = getParameterByName('gamename');
-			Client.newGame(gameid, gamename, initredplayers, initblueplayers);
-		} else {
-			Client.connect(gameid);
-		}
-	});
+	startServer();
 
 	readyStars();
 }
@@ -309,7 +278,6 @@ function update() {
 }
 
 function readyStars() {
-   	//  Here we'll create 12 of them evenly spaced apart
     for (var i = 0; i < 27; i++)
     {
         //  Create a star inside of the 'stars' group
@@ -321,6 +289,37 @@ function readyStars() {
         //  This just gives each star a slightly random bounce value
         star.body.bounce.y = 0.8;
     }
+}
+
+function startServer() {
+	var server = getParameterByName('server');
+	gameid = getParameterByName('gameid');
+	var connect = getParameterByName('connect');
+
+	Client.start(server, function() {
+		if (!connect) {
+			var initredplayers = [], initblueplayers = [];
+			teams.red.players.forEach(function(item) {
+				initredplayers.push({
+					x: item.x,
+					y: item.y,
+					direction: item.direction
+				})
+			});
+			teams.blue.players.forEach(function(item) {
+				initblueplayers.push({
+					x: item.x,
+					y: item.y,
+					direction: item.direction
+				})
+			});
+
+			var gamename = getParameterByName('gamename');
+			Client.newGame(gameid, gamename, initredplayers, initblueplayers);
+		} else {
+			Client.connect(gameid);
+		}
+	});
 }
 
 function shoot(bulletplayer, bulletdir, relay) {

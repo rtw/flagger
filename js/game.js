@@ -94,7 +94,27 @@ function create() {
 			player.health = 100;
 			player.shield = 100;
 
-		    player.body.immovable = true;  
+			//  Player physics properties. Give the little guy a slight bounce.
+		    player.body.bounce.y = 0.2;
+		    player.body.gravity.y = 300;
+		    player.body.collideWorldBounds = true;
+		    
+		    player.moveLeft = function() {
+		    	player.body.velocity.x = -150;
+ 				player.animations.play('left');
+
+        		player.direction = -1;
+        		player.dx = -1;
+		    }
+
+		    player.moveRight = function() {
+		    	player.body.velocity.x = 150;
+ 				player.animations.play('right');
+
+        		player.direction = 1;
+        		player.dx = 1;
+		    }
+
 		    return player;
     	}
 
@@ -266,7 +286,6 @@ function update() {
 
 	function playerHit (player, bullet) {
 		Client.playerHit(player.teamname);
-
 		hit(player, bullet);
 	}
 
@@ -285,19 +304,9 @@ function update() {
     player.body.velocity.x = 0;
  
     if (cursors.left.isDown || btn.left) {
-        player.body.velocity.x = -150;
- 
-        player.animations.play('left');
-
-        player.direction = -1;
-        player.dx = -1;
+    	player.moveLeft();
     } else if (cursors.right.isDown || btn.right ) {
-        player.body.velocity.x = 150;
- 
-        player.animations.play('right');
-
-        player.direction = 1;
-        player.dx = 1;
+        player.moveRight();
     } else {
         player.animations.stop();
  

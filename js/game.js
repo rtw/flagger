@@ -68,29 +68,13 @@ function create() {
 	    platforms.enableBody = true;
 	 
 	    // Here we create the ground.
-	    var ground = platforms.create(0, game.world.height - 64, 'ground');
+	    var ground = platforms.create(0, game.world.height - 134, 'ground');
 	 
 	    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
 	    ground.scale.setTo(2, 2);
 	 
 	    //  This stops it from falling away when you jump on it
-	    ground.body.immovable = true;
-	 
-	    //  Now let's create two ledges
-	    var ledge = platforms.create(300, game.world.height - 150, 'platform');
-	    ledge.body.immovable = true;
-	 
-	    var ledge = platforms.create(750, game.world.height - 150, 'platform');
-	 	ledge.body.immovable = true;   
-
-	 	var ledge = platforms.create(1200, game.world.height - 150, 'platform');
-	 	ledge.body.immovable = true;  
-
-	 	var ledge = platforms.create(525, game.world.height - 250, 'platform');
-	 	ledge.body.immovable = true;   
-
-	 	var ledge = platforms.create(975, game.world.height - 250, 'platform');
-	 	ledge.body.immovable = true;   
+	    ground.body.immovable = true; 
     }
 
     function readyPlayers() {
@@ -117,11 +101,11 @@ function create() {
     	blueplayers = game.add.group();
 
     	for (var idx = 0; idx < teams.red.numberOfPlayers; idx ++) {
-    		teams.red.players.push(createPlayer(redplayers, 'red', idx*30 + 32, 968));
+    		teams.red.players.push(createPlayer(redplayers, 'red', idx*30 + 32, 800));
     	}
 
     	for (var idx = 0; idx < teams.blue.numberOfPlayers; idx ++) {
-    		teams.blue.players.push(createPlayer(blueplayers, 'blue', idx*30 + 1770, 968));
+    		teams.blue.players.push(createPlayer(blueplayers, 'blue', idx*30 + 1770, 800));
     	}
     }
 
@@ -176,7 +160,7 @@ function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-	game.world.setBounds(0, 0, 1920, 1080);
+	game.world.setBounds(0, 0, 3072, 1080);
 
     //  A simple background for our game
     game.add.sprite(0, 0, 'bg');

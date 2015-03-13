@@ -53,7 +53,7 @@ function preload() {
     game.load.image('bullet', 'assets/bullet.png');
     game.load.spritesheet('red', 'assets/dude.png', 32, 48);
     game.load.spritesheet('blue', 'assets/dude.png', 32, 48);
-
+	game.load.image('box', 'assets/box.png');
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignVertically = true;
 }

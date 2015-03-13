@@ -18,6 +18,7 @@ var btn = {
 	up: false
 };
 
+
 var	team,
 	playernumber,
 	player,
@@ -50,7 +51,6 @@ function preload() {
     game.load.image('platform', 'assets/platform.png');
     game.load.image('star', 'assets/star.png');
     game.load.image('bullet', 'assets/bullet.png');
-    
     game.load.spritesheet('red', 'assets/dude.png', 32, 48);
     game.load.spritesheet('blue', 'assets/dude.png', 32, 48);
 	game.load.image('box', 'assets/box.png');
@@ -94,11 +94,7 @@ function create() {
 			player.health = 100;
 			player.shield = 100;
 
-			//  Player physics properties. Give the little guy a slight bounce.
-		    player.body.bounce.y = 0.2;
-		    player.body.gravity.y = 300;
-		    player.body.collideWorldBounds = true;
-		    
+		    player.body.immovable = true;  
 		    return player;
     	}
 
@@ -151,6 +147,14 @@ function create() {
 	    wintext.fixedToCamera = true;
     }
 
+    function readyScoreText() {
+    	redScoreText = game.add.text(16, 16, 'Red: 0', { fontSize: '32px', fill: '#FFF' });
+	    redScoreText.fixedToCamera = true;
+
+	    blueScoreText = game.add.text(830, 16, 'Blue: 0', { fontSize: '32px', fill: '#FFF' });
+	    blueScoreText.fixedToCamera = true;
+    }
+
     game.state.disableVisibilityChange = true;
 
     //  We're going to be using physics, so enable the Arcade Physics system
@@ -171,7 +175,7 @@ function create() {
 	readyGameController();
 	
 	boxes = game.add.group();
-	boxes.enablebody = true;
+	boxes.enableBody = true;
 	var box = boxes.create(500, 900, 'box');
 	box.body.immovable = true;
 	
@@ -184,7 +188,10 @@ function create() {
 	bluebullets = game.add.group();
 	bluebullets.enableBody = true;
 
+	readyScoreText();
+
     readyWinText();
+
 
     var teamname = getParameterByName('team') || 'red';
     team = teams[teamname];
@@ -197,14 +204,64 @@ function create() {
 
 	player = team.players[playernumber];
 
+    //  Player physics properties. Give the little guy a slight bounce.
+    player.body.bounce.y = 0.2;
+    player.body.gravity.y = 300;
+    player.body.collideWorldBounds = true;
+    player.body.gravity.y = 300;
+    player.body.immovable = false;  
+
 	game.camera.follow(player);
 
-	startServer();
+	var server = getParameterByName('server');
+	gameid = getParameterByName('gameid');
+	var connect = getParameterByName('connect');
+
+	Client.start(server, function() {
+		if (!connect) {
+			var initredplayers = [], initblueplayers = [];
+			teams.red.players.forEach(function(item) {
+				initredplayers.push({
+					x: item.x,
+					y: item.y,
+					direction: item.direction
+				})
+			});
+			teams.blue.players.forEach(function(item) {
+				initblueplayers.push({
+					x: item.x,
+					y: item.y,
+					direction: item.direction
+				})
+			});
+
+			var gamename = getParameterByName('gamename');
+			Client.newGame(gameid, gamename, initredplayers, initblueplayers);
+		} else {
+			Client.connect(gameid);
+		}
+	});
+
+	readyStars();
 }
  
 function update() {
 	function collectStar (player, star) {
+        // Removes the star from the screen
 	    star.kill();
+
+	    //  Add and update the score
+	    if (player.teamname == 'red' && team.name == 'red') {
+	    	score.red += 10;
+	    	Client.updateScore('red', score.red);
+	    	redScoreText.text = 'Red: ' + score.red;
+	    } 
+
+	    if (player.teamname == 'blue' && team.name == 'blue') {
+	    	score.blue += 10;
+	    	Client.updateScore('blue', score.blue);
+	    	blueScoreText.text = 'Blue: ' + score.blue;
+	    }
 	}
 
 	function playerHit (player, bullet) {
@@ -214,10 +271,6 @@ function update() {
 	}
 
 	//  Collide the player and the stars with the platforms
-	game.physics.arcade.collide(redplayers, redplayers);
-	game.physics.arcade.collide(blueplayers, redplayers);
-	game.physics.arcade.collide(blueplayers, blueplayers);
-
 	game.physics.arcade.collide(redplayers, platforms);
     game.physics.arcade.collide(blueplayers, platforms);
     game.physics.arcade.collide(stars, platforms);
@@ -262,6 +315,7 @@ function update() {
 }
 
 function readyStars() {
+   	//  Here we'll create 12 of them evenly spaced apart
     for (var i = 0; i < 27; i++)
     {
         //  Create a star inside of the 'stars' group
@@ -273,37 +327,6 @@ function readyStars() {
         //  This just gives each star a slightly random bounce value
         star.body.bounce.y = 0.8;
     }
-}
-
-function startServer() {
-	var server = getParameterByName('server');
-	gameid = getParameterByName('gameid');
-	var connect = getParameterByName('connect');
-
-	Client.start(server, function() {
-		if (!connect) {
-			var initredplayers = [], initblueplayers = [];
-			teams.red.players.forEach(function(item) {
-				initredplayers.push({
-					x: item.x,
-					y: item.y,
-					direction: item.direction
-				})
-			});
-			teams.blue.players.forEach(function(item) {
-				initblueplayers.push({
-					x: item.x,
-					y: item.y,
-					direction: item.direction
-				})
-			});
-
-			var gamename = getParameterByName('gamename');
-			Client.newGame(gameid, gamename, initredplayers, initblueplayers);
-		} else {
-			Client.connect(gameid);
-		}
-	});
 }
 
 function shoot(bulletplayer, bulletdir, relay) {
@@ -340,6 +363,20 @@ function shoot(bulletplayer, bulletdir, relay) {
 
 function hit(hitplayer, bullet) {
 
+	function updateScore() {
+		if (hitplayer.teamname == 'blue' && team.name == 'red') {
+	    	score.red += 50;
+	    	Client.updateScore('red', score.red);
+	    	redScoreText.text = 'Red: ' + score.red;
+	    } 
+
+	    if (hitplayer.teamname == 'red' && team.name == 'blue') {
+	    	score.blue += 50;
+	    	Client.updateScore('blue', score.blue);
+	    	blueScoreText.text = 'Blue: ' + score.blue;
+	    }
+	}
+
 	bullet.kill();
     
     if (hitplayer.shield > 0) {
@@ -356,6 +393,8 @@ function hit(hitplayer, bullet) {
 
     hitplayer.killed = true;
     hitplayer.kill();
+	
+    updateScore();
 
 
     // only win when all other team players are dead

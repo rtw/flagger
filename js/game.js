@@ -204,8 +204,6 @@ function create() {
 	game.camera.follow(player);
 
 	startServer();
-
-	readyStars();
 }
  
 function update() {

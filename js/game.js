@@ -75,6 +75,7 @@ function create() {
 	 
 	    //  This stops it from falling away when you jump on it
 	    ground.body.immovable = true; 
+		
     }
 
     function readyPlayers() {
@@ -176,7 +177,12 @@ function create() {
     readyPlatform();
 
 	readyGameController();
-
+	
+	boxes = game.add.group();
+	boxes.enablebody = true;
+	var box = boxes.create(500, 900, 'box');
+	box.body.immovable = true;
+	
 	stars = game.add.group();
    	stars.enableBody = true;
 

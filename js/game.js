@@ -205,7 +205,7 @@ function create() {
 	boxes.enableBody = true;
 	var box = boxes.create(500, 900, 'box');
 	box.body.immovable = true;
-	
+
 	stars = game.add.group();
    	stars.enableBody = true;
 
@@ -296,6 +296,12 @@ function update() {
 
     game.physics.arcade.overlap(redplayers, bluebullets, playerHit, null, this);
     game.physics.arcade.overlap(blueplayers, redbullets, playerHit, null, this);
+
+    game.physics.arcade.collide(redplayers, boxes);
+	game.physics.arcade.collide(blueplayers, boxes);
+    
+    game.physics.arcade.overlap(boxes, redplayers, boxhit, null, this);
+    game.physics.arcade.overlap(boxes, blueplayers, boxhit, null, this);
     
     // Move Player
     player.body.velocity.x = 0;

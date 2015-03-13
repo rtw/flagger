@@ -182,6 +182,44 @@ function create() {
 	    blueScoreText.fixedToCamera = true;
     }
 
+    function readyBoxes() {
+    	boxes = game.add.group();
+		boxes.enableBody = true;
+		var box = boxes.create(500, 900, 'box');
+		box.body.immovable = true;
+    }
+
+    function startServer() {
+    	var server = getParameterByName('server');
+		gameid = getParameterByName('gameid');
+		var connect = getParameterByName('connect');
+
+		Client.start(server, function() {
+			if (!connect) {
+				var initredplayers = [], initblueplayers = [];
+				teams.red.players.forEach(function(item) {
+					initredplayers.push({
+						x: item.x,
+						y: item.y,
+						direction: item.direction
+					})
+				});
+				teams.blue.players.forEach(function(item) {
+					initblueplayers.push({
+						x: item.x,
+						y: item.y,
+						direction: item.direction
+					})
+				});
+
+				var gamename = getParameterByName('gamename');
+				Client.newGame(gameid, gamename, initredplayers, initblueplayers);
+			} else {
+				Client.connect(gameid);
+			}
+		});
+    }
+
     game.state.disableVisibilityChange = true;
 
     //  We're going to be using physics, so enable the Arcade Physics system
@@ -201,10 +239,7 @@ function create() {
 
 	readyGameController();
 	
-	boxes = game.add.group();
-	boxes.enableBody = true;
-	var box = boxes.create(500, 900, 'box');
-	box.body.immovable = true;
+	readyBoxes();
 
 	stars = game.add.group();
    	stars.enableBody = true;
@@ -232,67 +267,23 @@ function create() {
 
 	game.camera.follow(player);
 
-	var server = getParameterByName('server');
-	gameid = getParameterByName('gameid');
-	var connect = getParameterByName('connect');
-
-	Client.start(server, function() {
-		if (!connect) {
-			var initredplayers = [], initblueplayers = [];
-			teams.red.players.forEach(function(item) {
-				initredplayers.push({
-					x: item.x,
-					y: item.y,
-					direction: item.direction
-				})
-			});
-			teams.blue.players.forEach(function(item) {
-				initblueplayers.push({
-					x: item.x,
-					y: item.y,
-					direction: item.direction
-				})
-			});
-
-			var gamename = getParameterByName('gamename');
-			Client.newGame(gameid, gamename, initredplayers, initblueplayers);
-		} else {
-			Client.connect(gameid);
-		}
-	});
+	startServer();
 }
  
 function update() {
-	function collectStar (player, star) {
-        // Removes the star from the screen
-	    star.kill();
-
-	    //  Add and update the score
-	    if (player.teamname == 'red' && team.name == 'red') {
-	    	score.red += 10;
-	    	Client.updateScore('red', score.red);
-	    	redScoreText.text = 'Red: ' + score.red;
-	    } 
-
-	    if (player.teamname == 'blue' && team.name == 'blue') {
-	    	score.blue += 10;
-	    	Client.updateScore('blue', score.blue);
-	    	blueScoreText.text = 'Blue: ' + score.blue;
-	    }
-	}
-
 	function playerHit (player, bullet) {
 		Client.playerHit(player.teamname);
 		hit(player, bullet);
 	}
 
-	//  Collide the player and the stars with the platforms
+	game.physics.arcade.collide(blueplayers, blueplayers);
+	game.physics.arcade.collide(redplayers, blueplayers);
+	game.physics.arcade.collide(redplayers, redplayers);
+
+	
 	game.physics.arcade.collide(redplayers, platforms);
     game.physics.arcade.collide(blueplayers, platforms);
     game.physics.arcade.collide(stars, platforms);
-
-    game.physics.arcade.overlap(redplayers, stars, collectStar, null, this);
-    game.physics.arcade.overlap(blueplayers, stars, collectStar, null, this);
 
     game.physics.arcade.overlap(redplayers, bluebullets, playerHit, null, this);
     game.physics.arcade.overlap(blueplayers, redbullets, playerHit, null, this);
@@ -360,21 +351,6 @@ function shoot(bulletplayer, bulletdir, relay) {
 }
 
 function hit(hitplayer, bullet) {
-
-	function updateScore() {
-		if (hitplayer.teamname == 'blue' && team.name == 'red') {
-	    	score.red += 50;
-	    	Client.updateScore('red', score.red);
-	    	redScoreText.text = 'Red: ' + score.red;
-	    } 
-
-	    if (hitplayer.teamname == 'red' && team.name == 'blue') {
-	    	score.blue += 50;
-	    	Client.updateScore('blue', score.blue);
-	    	blueScoreText.text = 'Blue: ' + score.blue;
-	    }
-	}
-
 	bullet.kill();
     
     if (hitplayer.shield > 0) {
@@ -392,9 +368,6 @@ function hit(hitplayer, bullet) {
     hitplayer.killed = true;
     hitplayer.kill();
 	
-    updateScore();
-
-
     // only win when all other team players are dead
     var win = true;
     var hitteam = teams[hitplayer.teamname];

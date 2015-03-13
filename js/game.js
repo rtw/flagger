@@ -115,6 +115,13 @@ function create() {
         		player.dx = 1;
 		    }
 
+		    player.moveStop = function() {
+				player.animations.stop();
+ 
+        		player.frame = 4;
+				player.dx = 0;
+		    }
+
 		    return player;
     	}
 
@@ -212,7 +219,6 @@ function create() {
 
     readyWinText();
 
-
     var teamname = getParameterByName('team') || 'red';
     team = teams[teamname];
 
@@ -223,13 +229,6 @@ function create() {
 	playernumber = getParameterByName('player') || 0;
 
 	player = team.players[playernumber];
-
-    //  Player physics properties. Give the little guy a slight bounce.
-    player.body.bounce.y = 0.2;
-    player.body.gravity.y = 300;
-    player.body.collideWorldBounds = true;
-    player.body.gravity.y = 300;
-    player.body.immovable = false;  
 
 	game.camera.follow(player);
 
@@ -306,10 +305,7 @@ function update() {
     } else if (cursors.right.isDown || btn.right ) {
         player.moveRight();
     } else {
-        player.animations.stop();
- 
-        player.frame = 4;
-		player.dx = 0;
+        player.moveStop();
     }
 
     if (fireButton.isDown || btn.shoot) {

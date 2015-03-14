@@ -53,8 +53,8 @@ function preload() {
     game.load.image('bullet', 'assets/bullet.png');
     game.load.image('box', 'assets/box.png');
 
-    game.load.spritesheet('red', 'assets/dude.png', 32, 48);
-    game.load.spritesheet('blue', 'assets/dude.png', 32, 48);
+    game.load.spritesheet('red', 'assets/dude.png', 49, 60);
+    game.load.spritesheet('blue', 'assets/dude.png', 49, 60);
 	
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignVertically = true;
@@ -88,11 +88,11 @@ function create() {
 			player.shield = 100;
 
 		    player.body.bounce.y = 0.1;
-		    player.body.gravity.y = 700;
+		    player.body.gravity.y = 760 ;
 		    player.body.collideWorldBounds = true;
 		    
 		    player.moveLeft = function() {
-		    	player.body.velocity.x = -150;
+		    	player.body.velocity.x = -300;
  				player.animations.play('left');
 
         		player.direction = -1;
@@ -100,7 +100,7 @@ function create() {
 		    }
 
 		    player.moveRight = function() {
-		    	player.body.velocity.x = 150;
+		    	player.body.velocity.x = 300;
  				player.animations.play('right');
 
         		player.direction = 1;

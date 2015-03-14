@@ -79,8 +79,8 @@ function create() {
     		game.physics.arcade.enable(player);
 
 	 		//  Our two animations, walking left and right.
-		    player.animations.add('left', [0, 1, 2, 3], 10, true);
-		    player.animations.add('right', [5, 6, 7, 8], 10, true);
+		    player.animations.add('left', [0, 1, 2, 3,], 10, true);
+		    player.animations.add('right', [5, 6, 7, 8,], 10, true);
 
 		    player.teamname = teamname;
 			player.direction = 1;
@@ -324,14 +324,14 @@ function shoot(bulletplayer, bulletdir, relay) {
 	}
 
 	if (bulletdir > 0) {
-		var bullet = bullets.create(bulletplayer.x+30, bulletplayer.y+20, 'bullet');
+		var bullet = bullets.create(bulletplayer.x-120, bulletplayer.y+1, 'bullet');
 		bullet.body.velocity.x = 500;
 	} else {
-		var bullet = bullets.create(bulletplayer.x-2, bulletplayer.y+20, 'bullet');
+		var bullet = bullets.create(bulletplayer.x-180, bulletplayer.y+1, 'bullet');
 		bullet.body.velocity.x = -500;
 	}
 
-	bulletTime = game.time.now + 400;
+	bulletTime = game.time.now +400;
 
 	if (relay) {
 		Client.shoot(team.name, bulletdir, playernumber);

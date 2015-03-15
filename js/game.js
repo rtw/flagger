@@ -53,9 +53,11 @@ function preload() {
     game.load.image('bullet', 'assets/bullet.png');
     game.load.image('box', 'assets/box.png');
 
-    game.load.spritesheet('red', 'assets/redteam.png', 43, 64);
     game.load.spritesheet('blue', 'assets/dude.png', 32, 48);
 	
+	game.load.atlasJSONHash('red', 'assets/test.png', 'assets/test.json');
+
+
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignVertically = true;
 }
@@ -75,14 +77,65 @@ function create() {
     	function createPlayer(players, teamname, x, y) {
     		var player = players.create(x, y, teamname);
 	 		
+    		player.scale.setTo(0.25,0.25);
+
 	 		//  We need to enable physics on the player
     		game.physics.arcade.enable(player);
 
 	 		//  Our two animations, walking left and right.
-		    player.animations.add('left', [9,8,7,6,5,4,3,2,1,0], 10, true);
-		    player.animations.add('right', [10,11,12,13,14,15,16,17,18,19], 10, true);
-		    player.animations.add('shootright', [20,21,22,23,24,25,26,27,28,29], 10, true);
-		    player.animations.add('shootleft', [39,38,37,36,35,34,33,32,31,30], 10, true);
+		    player.animations.add('left', [
+		    	'Walk__000.png',
+		    	'Walk__001.png',
+		    	'Walk__002.png',
+		    	'Walk__003.png',
+		    	'Walk__004.png',
+		    	'Walk__005.png',
+		    	'Walk__006.png',
+		    	'Walk__007.png',
+		    	'Walk__008.png',
+		    	'Walk__009'
+		    ], 10, true);
+
+		    player.animations.add('right', [
+		    	'Walk__000.png',
+		    	'Walk__001.png',
+		    	'Walk__002.png',
+		    	'Walk__003.png',
+		    	'Walk__004.png',
+		    	'Walk__005.png',
+		    	'Walk__006.png',
+		    	'Walk__007.png',
+		    	'Walk__008.png',
+		    	'Walk__009.png'
+		    ], 10, true);
+
+
+		    player.animations.add('shootleft', [
+		    	'Shoot__000.png',
+		    	'Shoot__001.png',
+		    	'Shoot__002.png',
+		    	'Shoot__003.png',
+		    	'Shoot__004.png',
+		    	'Shoot__005.png',
+		    	'Shoot__006.png',
+		    	'Shoot__007.png',
+		    	'Shoot__008.png',
+		    	'Shoot__009.png'
+		    ], 10, true);
+
+
+		    player.animations.add('shootright', [
+		    	'Shoot__000.png',
+		    	'Shoot__001.png',
+		    	'Shoot__002.png',
+		    	'Shoot__003.png',
+		    	'Shoot__004.png',
+		    	'Shoot__005.png',
+		    	'Shoot__006.png',
+		    	'Shoot__007.png',
+		    	'Shoot__008.png',
+		    	'Shoot__009.png'
+		    ], 10, true);
 
 		    player.teamname = teamname;
 			player.direction = 1;
@@ -343,10 +396,10 @@ function shoot(bulletplayer, bulletdir, relay) {
 	}
 
 	if (bulletdir > 0) {
-		var bullet = bullets.create(bulletplayer.x+35, bulletplayer.y+30, 'bullet');
+		var bullet = bullets.create(bulletplayer.x+35, bulletplayer.y+62, 'bullet');
 		bullet.body.velocity.x = 500;
 	} else {
-		var bullet = bullets.create(bulletplayer.x+1, bulletplayer.y+30, 'bullet');
+		var bullet = bullets.create(bulletplayer.x+1, bulletplayer.y+62, 'bullet');
 		bullet.body.velocity.x = -500;
 	}
 

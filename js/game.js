@@ -53,8 +53,8 @@ function preload() {
     game.load.image('bullet', 'assets/bullet.png');
     game.load.image('box', 'assets/box.png');
 
-    game.load.spritesheet('red', 'assets/dude.png', 49, 60);
-    game.load.spritesheet('blue', 'assets/dude.png', 49, 60);
+    game.load.spritesheet('red', 'assets/redteam.png', 43, 64);
+    game.load.spritesheet('blue', 'assets/dude.png', 32, 48);
 	
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignVertically = true;
@@ -79,8 +79,10 @@ function create() {
     		game.physics.arcade.enable(player);
 
 	 		//  Our two animations, walking left and right.
-		    player.animations.add('left', [0, 1, 2, 3], 5, true);
-		    player.animations.add('right', [5, 6, 7, 8], 5, true);
+		    player.animations.add('left', [9,8,7,6,5,4,3,2,1,0], 10, true);
+		    player.animations.add('right', [10,11,12,13,14,15,16,17,18,19], 10, true);
+		    player.animations.add('shootright', [20,21,22,23,24,25,26,27,28,29], 10, true);
+		    player.animations.add('shootleft', [39,38,37,36,35,34,33,32,31,30], 10, true);
 
 		    player.teamname = teamname;
 			player.direction = 1;
@@ -92,7 +94,7 @@ function create() {
 		    player.body.collideWorldBounds = true;
 		    
 		    player.moveLeft = function() {
-		    	player.body.velocity.x = -70;
+		    	player.body.velocity.x = -100;
  				player.animations.play('left');
 
         		player.direction = -1;
@@ -100,7 +102,7 @@ function create() {
 		    }
 
 		    player.moveRight = function() {
-		    	player.body.velocity.x = 70;
+		    	player.body.velocity.x = 100;
  				player.animations.play('right');
 
         		player.direction = 1;
@@ -111,11 +113,21 @@ function create() {
 				player.animations.stop();
  
  				if (player.direction == 1) 
-        			player.frame = 8;
+        			player.frame = 10;
         		else 
-        			player.frame = 1;
+        			player.frame = 0;
 
 				player.dx = 0;
+		    }
+
+		    player.shoot = function() {
+		    	
+			    	if (player.direction == 1) {
+			    		player.animations.play('shootright');
+			    	} else {
+			    		player.animations.play('shootleft');
+			    	}
+			    shoot(player, player.direction, true);
 		    }
 
 		    return player;
@@ -293,7 +305,10 @@ function update() {
     }
 
     if (fireButton.isDown || btn.shoot) {
-    	 shoot(player, player.direction, true);
+    	player.isShooting = true;
+    	player.shoot();
+    } else {
+    	player.isShooting = false;
     }
     
     if ((cursors.up.isDown || btn.up)) {
@@ -328,10 +343,10 @@ function shoot(bulletplayer, bulletdir, relay) {
 	}
 
 	if (bulletdir > 0) {
-		var bullet = bullets.create(bulletplayer.x+30, bulletplayer.y+25, 'bullet');
+		var bullet = bullets.create(bulletplayer.x+35, bulletplayer.y+30, 'bullet');
 		bullet.body.velocity.x = 500;
 	} else {
-		var bullet = bullets.create(bulletplayer.x+1, bulletplayer.y+25, 'bullet');
+		var bullet = bullets.create(bulletplayer.x+1, bulletplayer.y+30, 'bullet');
 		bullet.body.velocity.x = -500;
 	}
 

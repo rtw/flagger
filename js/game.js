@@ -79,8 +79,8 @@ function create() {
     		game.physics.arcade.enable(player);
 
 	 		//  Our two animations, walking left and right.
-		    player.animations.add('left', [0, 1, 2, 3, ], 10, true);
-		    player.animations.add('right', [5, 6, 7, 8, ], 10, true);
+		    player.animations.add('left', [0, 1, 2, 3], 5, true);
+		    player.animations.add('right', [5, 6, 7, 8], 5, true);
 
 		    player.teamname = teamname;
 			player.direction = 1;
@@ -92,7 +92,7 @@ function create() {
 		    player.body.collideWorldBounds = true;
 		    
 		    player.moveLeft = function() {
-		    	player.body.velocity.x = -300;
+		    	player.body.velocity.x = -70;
  				player.animations.play('left');
 
         		player.direction = -1;
@@ -100,7 +100,7 @@ function create() {
 		    }
 
 		    player.moveRight = function() {
-		    	player.body.velocity.x = 300;
+		    	player.body.velocity.x = 70;
  				player.animations.play('right');
 
         		player.direction = 1;
@@ -110,7 +110,11 @@ function create() {
 		    player.moveStop = function() {
 				player.animations.stop();
  
-        		player.frame = 4;
+ 				if (player.direction == 1) 
+        			player.frame = 8;
+        		else 
+        			player.frame = 1;
+
 				player.dx = 0;
 		    }
 
